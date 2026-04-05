@@ -15,14 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Blue House Blog",
-  description: "Created by AIESEC Lebanon IM Team.",
+  title: "The Blue House",
+  description: "A home for voices that want to matter.",
   icons: {
     icon: [
-      { url: "/aiesec_man.png", type: "image/png" },
+      { url: "/blue_house.png", type: "image/png" },
     ],
-    shortcut: ["/aiesec_man.png"],
-    apple: ["/aiesec_man.png"],
+    shortcut: ["/blue_house.png"],
+    apple: ["/blue_house.png"],
   },
 };
 
@@ -36,10 +36,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
+        <div className="background" />
+        {/* <div className="bg" /> */}
+        <div className="header" />
         <CreateButton />
-
-        {children}
+        <div className="content">          
+          {children}
+        </div>
       </body>
     </html>
   );

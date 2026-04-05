@@ -34,9 +34,9 @@ export default function BlogGrid() {
     setLoading(false)
   }
 
-  useEffect(()=>{
-    loadPosts()
-  },[])
+  // useEffect(()=>{
+  //   loadPosts()
+  // },[])
 
   useEffect(()=>{
     if(inView) loadPosts()

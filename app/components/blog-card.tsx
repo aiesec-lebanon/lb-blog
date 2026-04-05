@@ -4,7 +4,17 @@ import { truncate, clampBody } from "../lib/utils"
 export default function BlogCard({ post }: { post: BlogPost }) {
 
   return (
-    <div className="bg-white rounded-xl shadow hover:shadow-lg transition p-4">
+    <div className="
+        bg-white/40 
+        backdrop-blur-lg 
+        border border-white/20 
+        rounded-xl 
+        shadow-md 
+        hover:shadow-xl 
+        hover:-translate-y-1
+        transition 
+        p-4
+      ">
 
       <h2 className="font-semibold text-lg mb-2">
         {truncate(post.title,120)}
