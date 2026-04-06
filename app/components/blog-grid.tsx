@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Masonry from "react-masonry-css"
 import BlogCard from "./blog-card"
 import SkeletonCard from "./skeleton-card"
 import { useInView } from "react-intersection-observer"
@@ -42,33 +41,55 @@ export default function BlogGrid() {
     if(inView) loadPosts()
   },[inView])
 
-  const breakpointColumnsObj = {
-    default: 4,
-    1200: 3,
-    800: 2,
-    500: 1
-  }
+  const columns: BlogPost[][] = [[], [], [], []]
+
+  posts.forEach((post, index) => {
+    columns[index % 4].push(post)
+  })
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <div className="w-full max-w-full overflow-x-hidden">
 
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="flex gap-4"
-        columnClassName="flex flex-col gap-4"
+      <div
+        className="grid w-full"
+        style={{
+          gridTemplateColumns: "5.25% 15.8% 15.8% 26.3% 15.8% 15.8% 5.25%"
+        }}
       >
+        <div aria-hidden="true" />
 
-        {posts.map((post,i)=>(
-          <BlogCard key={i} post={post}/>
-        ))}
+        <div className="min-w-0 flex flex-col gap-4 px-1">
+          {columns[0].map((post, i) => (
+            <BlogCard key={`c1-${i}`} post={post} />
+          ))}
+          {loading && <SkeletonCard />}
+        </div>
 
-        {loading &&
-          Array.from({length:4}).map((_,i)=>(
-            <SkeletonCard key={i}/>
-          ))
-        }
+        <div className="min-w-0 flex flex-col gap-4 px-1">
+          {columns[1].map((post, i) => (
+            <BlogCard key={`c2-${i}`} post={post} />
+          ))}
+          {loading && <SkeletonCard />}
+        </div>
 
-      </Masonry>
+        <div aria-hidden="true" />
+
+        <div className="min-w-0 flex flex-col gap-4 px-1">
+          {columns[2].map((post, i) => (
+            <BlogCard key={`c3-${i}`} post={post} />
+          ))}
+          {loading && <SkeletonCard />}
+        </div>
+
+        <div className="min-w-0 flex flex-col gap-4 px-1">
+          {columns[3].map((post, i) => (
+            <BlogCard key={`c4-${i}`} post={post} />
+          ))}
+          {loading && <SkeletonCard />}
+        </div>
+
+        <div aria-hidden="true" />
+      </div>
 
       <div ref={ref} className="h-10"></div>
 

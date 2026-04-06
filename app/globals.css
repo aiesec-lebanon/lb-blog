@@ -10,6 +10,7 @@
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
@@ -30,18 +31,6 @@ body {
   height: 78vh;
   overflow: auto;
 }
-
-/* .bgImg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-
-  background: url('/bg.png') no-repeat center top;
-  background-size: contain;   /* fills screen, crops overflow */
-  height: 100vh; /* ensures it fills viewport height */
-  width: 100vw;  /* ensures it fills viewport width */
-  background-position: center top; /* keep top aligned */
-} */
 
 .background {
   position: fixed;
