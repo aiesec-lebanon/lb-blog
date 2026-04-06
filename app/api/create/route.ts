@@ -1,4 +1,5 @@
 import BlogCreate from "@/types/blog-create"
+import UserInfo from "@/types/user-types"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -12,6 +13,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const user: UserInfo = await JSON.parse(req.cookies.get("user")?.value || "{}")
+    if (!user.id) {
+      return NextResponse.redirect(new URL("/login", req.url))
+    }
+    const expa_id = user.full_name.trim() + "-" + user.id
+
     const API = process.env.API_URL
 
     const response = await fetch(`${API}/posts`, {
@@ -19,7 +26,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({ ...data, expa_id })
     })
 
     if (!response.ok) {
