@@ -99,7 +99,7 @@ export default function BlogCreateForm() {
             className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
             // add padding to the left of the back button
             style={{ marginLeft: "20px" }}
-            onClick={() => window.history.back()}
+            onClick={() => window.location.href = "/"}
           >
             Back
           </button>
