@@ -51,10 +51,13 @@ export default function BlogGrid() {
     <div className="w-full max-w-full overflow-x-hidden">
 
       <div
-        className="grid w-full"
-        style={{
-          gridTemplateColumns: "5.25% 15.8% 15.8% 26.3% 15.8% 15.8% 5.25%"
-        }}
+        className="
+          grid w-full
+          grid-cols-1 
+          sm:grid-cols-2 
+          md:grid-cols-4 
+          lg:grid-cols-[5.25%_15.8%_15.8%_26.3%_15.8%_15.8%_5.25%]
+        "
       >
         <div aria-hidden="true" />
 

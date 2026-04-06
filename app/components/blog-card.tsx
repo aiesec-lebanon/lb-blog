@@ -28,7 +28,7 @@ export default function BlogCard({ post }: { post: BlogPost }) {
       )}
 
       {post.body && (
-        <p className="text-sm text-gray-700">
+        <p className="text-sm text-gray-700 whitespace-pre-line">
           {post.body}
         </p>
       )}
