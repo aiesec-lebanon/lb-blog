@@ -1,5 +1,5 @@
-import BlogPost from "../types/blog-post"
-import { truncate, clampBody } from "../lib/utils"
+import BlogPost from "../../types/blog-post"
+import { truncate } from "../lib/utils"
 
 export default function BlogCard({ post }: { post: BlogPost }) {
 

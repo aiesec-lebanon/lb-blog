@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import BlogCard from "./blog-card"
 import SkeletonCard from "./skeleton-card"
 import { useInView } from "react-intersection-observer"
-import BlogPost from "../types/blog-post"
+import BlogPost from "@/types/blog-post"
 
 export default function BlogGrid() {
 
@@ -32,10 +32,6 @@ export default function BlogGrid() {
 
     setLoading(false)
   }
-
-  // useEffect(()=>{
-  //   loadPosts()
-  // },[])
 
   useEffect(()=>{
     if(inView) loadPosts()

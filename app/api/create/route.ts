@@ -1,4 +1,4 @@
-import BlogCreate from "@/app/types/blog-create"
+import BlogCreate from "@/types/blog-create"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
