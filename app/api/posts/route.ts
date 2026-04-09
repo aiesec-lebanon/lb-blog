@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { readBackendError } from "@/server-utils/backend-error"
-import { getRequestUser, getRequestUsername } from "@/server-utils/session"
+import { getRequestUser } from "@/server-utils/session"
 import { createMockPost, listMockPosts } from "@/lib/mock-content-store"
 import { buildPostListResponse, normalizePost } from "@/lib/content-normalizers"
 import type { CreatePostInput } from "@/types/post-types"
@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = (await req.json()) as CreatePostInput
+    const selectedAuthor = body.username?.trim() || "Anonymous"
 
     if (!body.title?.trim() || !body.body?.trim()) {
       return NextResponse.json(
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
         {
           title: body.title.trim(),
           body: body.body.trim(),
+          username: selectedAuthor,
           image_url: body.image_url?.trim() || undefined,
         },
         user
@@ -122,7 +124,8 @@ export async function POST(req: NextRequest) {
         title: body.title.trim(),
         body: body.body.trim(),
         image_url: body.image_url?.trim() || undefined,
-        username: getRequestUsername(user),
+        username: selectedAuthor,
+        author: selectedAuthor,
         expa_id: user.id,
       }),
     })

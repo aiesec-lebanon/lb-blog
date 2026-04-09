@@ -94,17 +94,18 @@ export function getMockPostById(id: string) {
 export function createMockPost(input: CreatePostInput, user: UserInfo) {
   const store = getStore()
   const owner = normalizeOwner(user)
+  const selectedAuthor = input.username?.trim() || "Anonymous"
   const createdAt = nowIso()
   const post: Post = {
     id: String(store.nextPostId++),
     title: input.title,
     body: input.body,
-    username: owner.username,
+    username: selectedAuthor,
     expa_id: owner.expa_id,
     created_at: createdAt,
     updated_at: createdAt,
     timestamp: createdAt,
-    author: owner.username,
+    author: selectedAuthor,
   }
 
   store.posts.unshift(post)

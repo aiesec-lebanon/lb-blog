@@ -17,6 +17,7 @@ export default interface Post {
 export interface CreatePostInput {
   title: string;
   body: string;
+  username?: string;
   image_url?: string;
 }
 

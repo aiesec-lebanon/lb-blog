@@ -17,6 +17,7 @@ export default function PostForm({ mode, postId }: Props) {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const [title, setTitle] = useState("")
+  const [authorName, setAuthorName] = useState("")
   const [body, setBody] = useState("")
   const [loading, setLoading] = useState(mode === "edit")
   const [saving, setSaving] = useState(false)
@@ -107,6 +108,7 @@ export default function PostForm({ mode, postId }: Props) {
       const response = await createPost({
         title: title.trim(),
         body: body.trim(),
+        username: authorName.trim() || "Anonymous",
       })
 
       setSuccess("Post created successfully.")
@@ -187,6 +189,24 @@ export default function PostForm({ mode, postId }: Props) {
         )}
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          {!isEditMode && (
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="authorName">
+                Author Name
+              </label>
+              <input
+                id="authorName"
+                type="text"
+                value={authorName}
+                onChange={(event) => setAuthorName(event.target.value)}
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-black/30"
+                maxLength={80}
+                placeholder="Leave empty to publish as Anonymous"
+                disabled={!canSubmit}
+              />
+            </div>
+          )}
+
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="title">
               Title
