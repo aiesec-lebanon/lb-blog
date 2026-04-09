@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   const safePostId = String(parsedPostId)
 
   if (useMockData) {
-    return NextResponse.json(listMockComments(safePostId))
+    return NextResponse.json(listMockComments(safePostId).filter((comment) => !comment.is_deleted))
   }
 
   if (!apiUrl) {
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       normalizeComment(item, String(index + 1))
     )
 
-    return NextResponse.json(comments)
+    return NextResponse.json(comments.filter((comment: { is_deleted?: boolean }) => !comment.is_deleted))
   } catch {
     return NextResponse.json(
       { error: "Unable to load comments" },
@@ -80,6 +80,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as CreateCommentInput
     const parsedPostId = parsePositiveInt(body.post_id)
+    const username = getRequestUsername(user)
+    const expaId = String(user.id)
 
     if (!parsedPostId || !body.body?.trim()) {
       return NextResponse.json(
@@ -115,8 +117,8 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         post_id: String(parsedPostId),
         body: body.body.trim(),
-        username: getRequestUsername(user),
-        expa_id: user.id,
+        username,
+        expa_id: expaId,
       }),
     })
 
@@ -125,10 +127,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: message }, { status: response.status })
     }
 
-    const data = await response.json().catch(() => null)
-    const comment = normalizeComment(data?.comment ?? data?.data ?? data)
+    await response.json().catch(() => null)
 
-    return NextResponse.json({ success: true, comment }, { status: 201 })
+    return NextResponse.json({ success: true }, { status: 201 })
   } catch {
     return NextResponse.json(
       { error: "Invalid comment request" },

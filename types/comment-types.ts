@@ -6,13 +6,20 @@ export default interface Comment {
   expa_id: string;
   created_at: string;
   updated_at?: string;
+  is_deleted?: boolean;
 }
 
 export interface CreateCommentInput {
   post_id: string;
+  expa_id?: string;
+  username?: string;
   body: string;
 }
 
 export interface UpdateCommentInput {
   body: string;
+}
+
+export interface CommentApiErrorResponse {
+  error: string;
 }

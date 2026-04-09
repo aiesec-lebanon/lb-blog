@@ -25,7 +25,7 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
     setError("")
 
     try {
-      await updateComment(comment.id, comment.post_id, {
+      await updateComment(comment.id, {
         body: draft.trim(),
       })
       setIsEditing(false)
@@ -51,7 +51,7 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
     setError("")
 
     try {
-      await deleteComment(comment.id, comment.post_id)
+      await deleteComment(comment.id)
       await onChanged()
     } catch (requestError) {
       const message = requestError instanceof ApiClientError

@@ -29,6 +29,8 @@ export default function CommentForm({ postId, onCreated }: Props) {
     try {
       await createComment({
         post_id: postId,
+        expa_id: String(user.id),
+        username: user.username || "",
         body: body.trim(),
       })
 

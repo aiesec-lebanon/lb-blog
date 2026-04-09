@@ -77,6 +77,7 @@ export function normalizeComment(item: any, fallbackId?: string): Comment {
     expa_id: String(item?.expa_id ?? item?.expaId ?? item?.user_id ?? ""),
     created_at: item?.created_at || item?.timestamp || new Date().toISOString(),
     updated_at: item?.updated_at || undefined,
+    is_deleted: item?.is_deleted === true,
   }
 }
 

@@ -18,6 +18,7 @@ export default function PostDetail({ postId }: Props) {
   const { user } = useAuth()
   const [post, setPost] = useState<Post | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
+  const [commentsLoading, setCommentsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -39,13 +40,14 @@ export default function PostDetail({ postId }: Props) {
     setError("")
 
     try {
+      setCommentsLoading(true)
       const [postResponse, commentsResponse] = await Promise.all([
         getPost(safePostId),
         getComments(safePostId),
       ])
 
       setPost(postResponse)
-      setComments(commentsResponse)
+      setComments(commentsResponse.filter((comment) => !comment.is_deleted))
     } catch (requestError) {
       const message = requestError instanceof ApiClientError
         ? requestError.status === 404
@@ -54,6 +56,7 @@ export default function PostDetail({ postId }: Props) {
         : "Unable to load the post"
       setError(message)
     } finally {
+      setCommentsLoading(false)
       setLoading(false)
     }
   }
@@ -65,8 +68,13 @@ export default function PostDetail({ postId }: Props) {
   async function refreshComments() {
     if (!safePostId) return
 
-    const response = await getComments(safePostId)
-    setComments(response)
+    setCommentsLoading(true)
+    try {
+      const response = await getComments(safePostId)
+      setComments(response.filter((comment) => !comment.is_deleted))
+    } finally {
+      setCommentsLoading(false)
+    }
   }
 
   if (loading) {
@@ -130,10 +138,14 @@ export default function PostDetail({ postId }: Props) {
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-xl font-semibold text-gray-900">Comments</h2>
-          <span className="text-sm text-gray-500">{comments.length} total</span>
+          <span className="text-sm text-gray-500">{commentsLoading ? "Loading..." : `${comments.length} total`}</span>
         </div>
 
-        {comments.length === 0 ? (
+        {commentsLoading ? (
+          <div className="rounded-2xl bg-white/80 p-5 text-sm text-gray-500 shadow-lg ring-1 ring-black/10">
+            Loading comments...
+          </div>
+        ) : comments.length === 0 ? (
           <div className="rounded-2xl bg-white/80 p-5 text-sm text-gray-500 shadow-lg ring-1 ring-black/10">
             No comments yet.
           </div>
@@ -143,7 +155,7 @@ export default function PostDetail({ postId }: Props) {
               <CommentItem
                 key={comment.id}
                 comment={comment}
-                canEdit={!!user && String(comment.expa_id) === String(user.id)}
+                canEdit={!!user && Number(comment.expa_id) === Number(user.id)}
                 onChanged={refreshComments}
               />
             ))}

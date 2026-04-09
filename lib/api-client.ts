@@ -101,31 +101,29 @@ export async function getComments(postId: string) {
 }
 
 export async function createComment(payload: CreateCommentInput) {
-  return requestJson<{ success: boolean; comment?: Comment }>("/api/comments", {
+  return requestJson<{ success: boolean }>("/api/comments", {
     method: "POST",
     body: JSON.stringify(payload),
   })
 }
 
-export async function updateComment(
-  id: string,
-  postId: string,
-  payload: UpdateCommentInput
-) {
-  return requestJson<{ success: boolean; comment?: Comment }>(
-    `/api/comments/${id}?post_id=${encodeURIComponent(postId)}`,
-    {
-      method: "PUT",
-      body: JSON.stringify(payload),
-    }
-  )
+export async function updateComment(id: string, payload: UpdateCommentInput) {
+  if (!isValidPositiveIntString(id)) {
+    throw new ApiClientError("Invalid comment id", 400)
+  }
+
+  return requestJson<{ success: boolean }>(`/api/comments/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  })
 }
 
-export async function deleteComment(id: string, postId: string) {
-  return requestJson<{ success: boolean }>(
-    `/api/comments/${id}?post_id=${encodeURIComponent(postId)}`,
-    {
-      method: "DELETE",
-    }
-  )
+export async function deleteComment(id: string) {
+  if (!isValidPositiveIntString(id)) {
+    throw new ApiClientError("Invalid comment id", 400)
+  }
+
+  return requestJson<{ success: boolean }>(`/api/comments/${id}`, {
+    method: "DELETE",
+  })
 }
