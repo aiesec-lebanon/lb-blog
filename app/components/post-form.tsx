@@ -184,7 +184,15 @@ export default function PostForm({ mode, postId }: Props) {
 
         {!user && (
           <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700 ring-1 ring-amber-200">
-            Sign in to create or edit posts.
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span>Sign in to create or edit posts.</span>
+              <Link
+                href="/login"
+                className="inline-flex rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700"
+              >
+                Go to login
+              </Link>
+            </div>
           </div>
         )}
 
