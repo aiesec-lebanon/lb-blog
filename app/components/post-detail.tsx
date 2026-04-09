@@ -2,14 +2,12 @@
 
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useAuth } from "../context/auth-context"
-import { ApiClientError, deletePost, getComments, getPost } from "@/lib/api-client"
+import { ApiClientError, getComments, getPost } from "@/lib/api-client"
 import Comment from "@/types/comment-types"
 import Post from "@/types/post-types"
 import CommentForm from "./comment-form"
 import CommentItem from "./comment-item"
-import ConfirmModal from "./confirm-modal"
 import { formatDate } from "../lib/utils"
 
 type Props = {
@@ -17,14 +15,11 @@ type Props = {
 }
 
 export default function PostDetail({ postId }: Props) {
-  const router = useRouter()
   const { user } = useAuth()
   const [post, setPost] = useState<Post | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [deleting, setDeleting] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const safePostId = useMemo(() => {
     const n = Number(postId)
@@ -74,21 +69,6 @@ export default function PostDetail({ postId }: Props) {
     setComments(response)
   }
 
-  async function handleDeletePost() {
-    if (!safePostId) return
-
-    setDeleting(true)
-    try {
-      await deletePost(safePostId)
-      router.push("/posts")
-    } catch (requestError) {
-      setError(requestError instanceof ApiClientError ? requestError.message : "Unable to delete the post")
-    } finally {
-      setDeleting(false)
-      setShowDeleteModal(false)
-    }
-  }
-
   if (loading) {
     return <div className="mx-auto max-w-3xl px-3 py-12 text-center text-sm text-gray-500">Loading post...</div>
   }
@@ -113,6 +93,15 @@ export default function PostDetail({ postId }: Props) {
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-3 py-8 sm:py-12">
+      <div>
+        <Link
+          href="/posts"
+          className="inline-flex rounded-lg border border-gray-200 bg-white/80 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-black/5"
+        >
+          Back to posts
+        </Link>
+      </div>
+
       <article className="rounded-2xl bg-white/80 p-5 shadow-xl ring-1 ring-black/10 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -127,14 +116,6 @@ export default function PostDetail({ postId }: Props) {
               <Link href={`/posts/${post.id}/edit`} className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700">
                 Edit
               </Link>
-              <button
-                type="button"
-                onClick={() => setShowDeleteModal(true)}
-                disabled={deleting}
-                className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-700 disabled:opacity-60"
-              >
-                {deleting ? "Deleting..." : "Delete"}
-              </button>
             </div>
           )}
         </div>
@@ -170,15 +151,6 @@ export default function PostDetail({ postId }: Props) {
         )}
       </section>
 
-      <ConfirmModal
-        open={showDeleteModal}
-        title="Delete this post?"
-        message="This action cannot be undone."
-        confirmText="Delete"
-        loading={deleting}
-        onConfirm={handleDeletePost}
-        onCancel={() => setShowDeleteModal(false)}
-      />
     </main>
   )
 }

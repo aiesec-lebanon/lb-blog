@@ -7,7 +7,7 @@ export default function CreateButton() {
   const router = useRouter()
   const pathname = usePathname()
 
-  if (pathname === "/posts/new" || pathname === "/add") {
+  if (pathname === "/posts/new" || pathname === "/add" || pathname.startsWith("/posts/")) {
     return null
   }
 
