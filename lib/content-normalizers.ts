@@ -44,7 +44,8 @@ function syntheticCommentId(item: any) {
 
 export function normalizePost(item: any, fallbackId?: string): Post {
   const createdAt = item?.created_at || item?.timestamp || new Date().toISOString()
-  const username = item?.username || item?.author || item?.full_name || ""
+  const username = item?.username || item?.full_name || ""
+  const author = item?.author || item?.author_name || item?.display_author || ""
   const expaId = String(item?.expa_id ?? item?.expaId ?? item?.user_id ?? "")
   const id = String(item?.id ?? item?.post_id ?? syntheticPostId(item) ?? fallbackId ?? "")
 
@@ -60,7 +61,7 @@ export function normalizePost(item: any, fallbackId?: string): Post {
     deleted: item?.deleted === true || item?.is_deleted === true,
     image_url: item?.image_url || item?.image || undefined,
     timestamp: item?.timestamp || createdAt,
-    author: item?.author || username,
+    author: author || undefined,
     image: item?.image || item?.image_url || undefined,
   }
 }

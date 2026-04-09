@@ -217,7 +217,10 @@ export async function PUT(
     const data = await response.json().catch(() => null)
     const normalizedFromBackend = data ? normalizePost(data?.post ?? data?.data ?? data, postId) : null
     const post = normalizedFromBackend && normalizedFromBackend.title
-      ? normalizedFromBackend
+      ? {
+          ...normalizedFromBackend,
+          author: selectedAuthor,
+        }
       : {
           ...existingPost,
           title: body.title.trim(),
