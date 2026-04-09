@@ -5,30 +5,32 @@ export default function BlogCard({ post }: { post: BlogPost }) {
 
   return (
     <div className="
-        bg-white/40 
+        bg-white/78 
         backdrop-blur-lg 
-        border border-white/20 
+        ring-1 ring-black/10
         rounded-xl 
-        shadow-md 
-        hover:shadow-xl 
-        hover:-translate-y-1
+        shadow-[0_8px_24px_rgba(15,23,42,0.12)] 
+        hover:shadow-[0_12px_30px_rgba(15,23,42,0.16)] 
         transition 
         p-4
+        overflow-hidden
       ">
 
-      <h2 className="font-semibold text-lg mb-2">
+      <h2 className="font-semibold text-lg mb-2 break-words">
         {truncate(post.title,120)}
       </h2>
 
       {post.image && (
         <img
           src={post.image}
-          className="rounded mb-3 w-full object-cover"
+          className="block rounded mb-3 w-full object-cover"
+          loading="lazy"
+          alt={post.title}
         />
       )}
 
       {post.body && (
-        <p className="text-sm text-gray-700 whitespace-pre-line">
+        <p className="text-sm text-gray-700 whitespace-pre-line break-words">
           {post.body}
         </p>
       )}

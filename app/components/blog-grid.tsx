@@ -44,7 +44,7 @@ export default function BlogGrid() {
   })
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden">
+    <div className="w-full max-w-full overflow-x-hidden px-2 sm:px-3 md:px-0">
 
       <div
         className="
@@ -57,14 +57,14 @@ export default function BlogGrid() {
       >
         <div aria-hidden="true" />
 
-        <div className="min-w-0 flex flex-col gap-4 px-1">
+        <div className="min-w-0 flex flex-col gap-4 px-0.5 sm:px-1 pt-2">
           {columns[0].map((post, i) => (
             <BlogCard key={`c1-${i}`} post={post} />
           ))}
           {loading && <SkeletonCard />}
         </div>
 
-        <div className="min-w-0 flex flex-col gap-4 px-1">
+        <div className="min-w-0 flex flex-col gap-4 px-0.5 sm:px-1 pt-2">
           {columns[1].map((post, i) => (
             <BlogCard key={`c2-${i}`} post={post} />
           ))}
@@ -73,14 +73,14 @@ export default function BlogGrid() {
 
         <div aria-hidden="true" />
 
-        <div className="min-w-0 flex flex-col gap-4 px-1">
+        <div className="min-w-0 flex flex-col gap-4 px-0.5 sm:px-1 pt-2">
           {columns[2].map((post, i) => (
             <BlogCard key={`c3-${i}`} post={post} />
           ))}
           {loading && <SkeletonCard />}
         </div>
 
-        <div className="min-w-0 flex flex-col gap-4 px-1">
+        <div className="min-w-0 flex flex-col gap-4 px-0.5 sm:px-1 pt-2">
           {columns[3].map((post, i) => (
             <BlogCard key={`c4-${i}`} post={post} />
           ))}
