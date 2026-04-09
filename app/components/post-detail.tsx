@@ -9,7 +9,7 @@ import Comment from "@/types/comment-types"
 import Post from "@/types/post-types"
 import CommentForm from "./comment-form"
 import CommentItem from "./comment-item"
-import { formatDateTime } from "../lib/utils"
+import { formatDate } from "../lib/utils"
 
 type Props = {
   postId: string
@@ -104,7 +104,7 @@ export default function PostDetail({ postId }: Props) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm text-gray-500">
-              {post.username} • {formatDateTime(post.created_at)}
+              {post.username} • {formatDate(post.created_at)}
             </p>
             <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900">{post.title}</h1>
           </div>
@@ -125,14 +125,6 @@ export default function PostDetail({ postId }: Props) {
             </div>
           )}
         </div>
-
-        {(post.image_url || post.image) && (
-          <img
-            src={post.image_url || post.image || ""}
-            alt={post.title}
-            className="mt-6 block w-full rounded-2xl object-cover"
-          />
-        )}
 
         <div className="mt-6 whitespace-pre-line text-base leading-7 text-gray-700">
           {post.body}

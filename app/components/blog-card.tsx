@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useMemo, useState } from "react"
 import Post from "@/types/post-types"
 import { ApiClientError, deletePost } from "@/lib/api-client"
-import { clampBody, formatDateTime, truncate } from "../lib/utils"
+import { clampBody, formatDate, truncate } from "../lib/utils"
 import { useAuth } from "../context/auth-context"
 
 type Props = {
@@ -67,7 +67,7 @@ export default function BlogCard({ post, onDeleted }: Props) {
           <div className="mt-1 text-xs text-gray-500">
             <span>{post.username || post.author}</span>
             <span> • </span>
-            <span>{formatDateTime(post.created_at || post.timestamp || "")}</span>
+            <span>{formatDate(post.created_at || post.timestamp || "")}</span>
           </div>
         </div>
 
@@ -87,15 +87,6 @@ export default function BlogCard({ post, onDeleted }: Props) {
       <p className="mt-3 text-sm leading-6 text-gray-700">
         {clampBody(post.body, 180)}
       </p>
-
-      {(post.image_url || post.image) && (
-        <img
-          src={post.image_url || post.image || ""}
-          className="block mt-4 rounded-xl w-full object-cover"
-          loading="lazy"
-          alt={post.title}
-        />
-      )}
 
       <div className="mt-4 flex flex-wrap gap-2">
         <Link

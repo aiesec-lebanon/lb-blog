@@ -103,10 +103,8 @@ export function createMockPost(input: CreatePostInput, user: UserInfo) {
     expa_id: owner.expa_id,
     created_at: createdAt,
     updated_at: createdAt,
-    image_url: input.image_url,
     timestamp: createdAt,
     author: owner.username,
-    image: input.image_url,
   }
 
   store.posts.unshift(post)
@@ -124,8 +122,6 @@ export function updateMockPost(id: string, input: UpdatePostInput) {
 
   post.title = input.title
   post.body = input.body
-  post.image_url = input.image_url
-  post.image = input.image_url
   post.updated_at = nowIso()
 
   return post

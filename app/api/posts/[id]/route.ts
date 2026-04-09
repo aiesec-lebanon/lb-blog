@@ -39,8 +39,8 @@ async function findPostFromList(apiUrl: string, id: string) {
           ? data.data
           : []
 
-    const posts: Post[] = rawPosts.map((item: any, index: number) =>
-      normalizePost(item, String(page * 25 + index + 1))
+    const posts: Post[] = rawPosts.map((item: any) =>
+      normalizePost(item)
     )
 
     const match = posts.find((post) => String(post.id) === String(id))
@@ -151,7 +151,6 @@ export async function PUT(
       const post = updateMockPost(id, {
         title: body.title.trim(),
         body: body.body.trim(),
-        image_url: body.image_url?.trim() || undefined,
       })
 
       return NextResponse.json({ success: true, post })
@@ -182,7 +181,6 @@ export async function PUT(
       body: JSON.stringify({
         title: body.title.trim(),
         body: body.body.trim(),
-        image_url: body.image_url?.trim() || undefined,
         username: getRequestUsername(user),
         expa_id: user.id,
       }),

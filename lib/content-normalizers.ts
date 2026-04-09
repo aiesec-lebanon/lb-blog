@@ -1,13 +1,55 @@
 import Post from "@/types/post-types"
 import Comment from "@/types/comment-types"
 
+function hashString(value: string) {
+  let hash = 0
+
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) | 0
+  }
+
+  return Math.abs(hash).toString(36)
+}
+
+function syntheticPostId(item: any) {
+  const seed = [
+    item?.created_at,
+    item?.timestamp,
+    item?.title,
+    item?.body,
+    item?.username,
+    item?.author,
+  ]
+    .filter(Boolean)
+    .join("|")
+
+  return seed ? `post_${hashString(seed)}` : ""
+}
+
+function syntheticCommentId(item: any) {
+  const seed = [
+    item?.post_id,
+    item?.postId,
+    item?.created_at,
+    item?.timestamp,
+    item?.body,
+    item?.username,
+    item?.author,
+  ]
+    .filter(Boolean)
+    .join("|")
+
+  return seed ? `comment_${hashString(seed)}` : ""
+}
+
 export function normalizePost(item: any, fallbackId?: string): Post {
   const createdAt = item?.created_at || item?.timestamp || new Date().toISOString()
   const username = item?.username || item?.author || item?.full_name || ""
   const expaId = String(item?.expa_id ?? item?.expaId ?? item?.user_id ?? "")
+  const id = String(item?.id ?? item?.post_id ?? syntheticPostId(item) ?? fallbackId ?? "")
 
   return {
-    id: String(item?.id ?? fallbackId ?? item?.post_id ?? ""),
+    id,
     title: item?.title || "",
     body: item?.body || "",
     username,
@@ -22,8 +64,10 @@ export function normalizePost(item: any, fallbackId?: string): Post {
 }
 
 export function normalizeComment(item: any, fallbackId?: string): Comment {
+  const id = String(item?.id ?? item?.comment_id ?? syntheticCommentId(item) ?? fallbackId ?? "")
+
   return {
-    id: String(item?.id ?? fallbackId ?? item?.comment_id ?? ""),
+    id,
     post_id: String(item?.post_id ?? item?.postId ?? ""),
     body: item?.body || "",
     username: item?.username || item?.author || "",

@@ -50,8 +50,8 @@ export async function GET(req: NextRequest) {
           ? data.data
           : []
 
-    const posts = rawPosts.map((item: any, index: number) =>
-      normalizePost(item, String(page * limit + index + 1))
+    const posts = rawPosts.map((item: any) =>
+      normalizePost(item)
     )
 
     return NextResponse.json(buildPostListResponse(posts, limit))
@@ -87,7 +87,6 @@ export async function POST(req: NextRequest) {
         {
           title: body.title.trim(),
           body: body.body.trim(),
-          image_url: body.image_url?.trim() || undefined,
         },
         user
       )
@@ -110,7 +109,6 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         title: body.title.trim(),
         body: body.body.trim(),
-        image_url: body.image_url?.trim() || undefined,
         username: getRequestUsername(user),
         expa_id: user.id,
       }),

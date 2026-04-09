@@ -18,7 +18,6 @@ export default function PostForm({ mode, postId }: Props) {
   const { user, loading: authLoading } = useAuth()
   const [title, setTitle] = useState("")
   const [body, setBody] = useState("")
-  const [imageUrl, setImageUrl] = useState("")
   const [loading, setLoading] = useState(mode === "edit")
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
@@ -48,7 +47,6 @@ export default function PostForm({ mode, postId }: Props) {
 
         setTitle(data.post.title)
         setBody(data.post.body)
-        setImageUrl(data.post.image_url || data.post.image || "")
         setLoadedOwnerId(data.post.expa_id)
         setError("")
       } catch (requestError) {
@@ -85,7 +83,6 @@ export default function PostForm({ mode, postId }: Props) {
         const response = await updatePost(postId || "", {
           title: title.trim(),
           body: body.trim(),
-          image_url: imageUrl.trim() || undefined,
         })
 
         setSuccess("Post updated successfully.")
@@ -96,7 +93,6 @@ export default function PostForm({ mode, postId }: Props) {
       const response = await createPost({
         title: title.trim(),
         body: body.trim(),
-        image_url: imageUrl.trim() || undefined,
       })
 
       setSuccess("Post created successfully.")
@@ -205,21 +201,6 @@ export default function PostForm({ mode, postId }: Props) {
               className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-black/30"
               disabled={!canSubmit}
               required
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="imageUrl">
-              Image URL <span className="font-normal text-gray-400">(optional)</span>
-            </label>
-            <input
-              id="imageUrl"
-              type="url"
-              value={imageUrl}
-              onChange={(event) => setImageUrl(event.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-black/30"
-              placeholder="https://..."
-              disabled={!canSubmit}
             />
           </div>
 
