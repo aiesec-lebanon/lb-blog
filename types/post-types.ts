@@ -18,6 +18,7 @@ export interface CreatePostInput {
   title: string;
   body: string;
   username?: string;
+  author?: string;
   image_url?: string;
 }
 
