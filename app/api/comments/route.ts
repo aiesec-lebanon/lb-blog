@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   const safePostId = String(parsedPostId)
 
   if (useMockData) {
-    return NextResponse.json({ comments: listMockComments(safePostId) })
+    return NextResponse.json(listMockComments(safePostId))
   }
 
   if (!apiUrl) {
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       normalizeComment(item, String(index + 1))
     )
 
-    return NextResponse.json({ comments })
+    return NextResponse.json(comments)
   } catch {
     return NextResponse.json(
       { error: "Unable to load comments" },

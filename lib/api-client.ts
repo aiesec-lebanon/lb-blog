@@ -14,6 +14,15 @@ export class ApiClientError extends Error {
 
 type ApiResponse<T> = T & Partial<ApiErrorResponse>
 
+function isValidPositiveIntString(value: string) {
+  if (!value) {
+    return false
+  }
+
+  const parsed = Number(value)
+  return Number.isInteger(parsed) && parsed > 0
+}
+
 async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     credentials: "include",
@@ -43,7 +52,12 @@ export async function getPosts(page = 0, limit = 25) {
 }
 
 export async function getPost(id: string) {
-  return requestJson<{ post: Post }>(`/api/posts/${id}`)
+  if (!isValidPositiveIntString(id)) {
+    throw new ApiClientError("Invalid post id", 400)
+  }
+
+  const data = await requestJson<Post | { post: Post }>(`/api/posts/${id}`)
+  return (data as { post?: Post }).post ?? (data as Post)
 }
 
 export async function createPost(payload: CreatePostInput) {
@@ -54,6 +68,10 @@ export async function createPost(payload: CreatePostInput) {
 }
 
 export async function updatePost(id: string, payload: UpdatePostInput) {
+  if (!isValidPositiveIntString(id)) {
+    throw new ApiClientError("Invalid post id", 400)
+  }
+
   return requestJson<{ success: boolean; post?: Post }>(`/api/posts/${id}`, {
     method: "PUT",
     body: JSON.stringify(payload),
@@ -61,15 +79,25 @@ export async function updatePost(id: string, payload: UpdatePostInput) {
 }
 
 export async function deletePost(id: string) {
+  if (!isValidPositiveIntString(id)) {
+    throw new ApiClientError("Invalid post id", 400)
+  }
+
   return requestJson<{ success: boolean }>(`/api/posts/${id}`, {
     method: "DELETE",
   })
 }
 
 export async function getComments(postId: string) {
-  return requestJson<{ comments: Comment[] }>(
+  if (!isValidPositiveIntString(postId)) {
+    throw new ApiClientError("Invalid post id", 400)
+  }
+
+  const data = await requestJson<Comment[] | { comments: Comment[] }>(
     `/api/comments?post_id=${encodeURIComponent(postId)}`
   )
+
+  return Array.isArray(data) ? data : data.comments || []
 }
 
 export async function createComment(payload: CreateCommentInput) {

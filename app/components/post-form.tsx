@@ -54,9 +54,9 @@ export default function PostForm({ mode, postId }: Props) {
           return
         }
 
-        setTitle(data.post.title)
-        setBody(data.post.body)
-        setLoadedOwnerId(data.post.expa_id)
+        setTitle(data.title)
+        setBody(data.body)
+        setLoadedOwnerId(data.expa_id)
         setError("")
       } catch (requestError) {
         if (ignore) {

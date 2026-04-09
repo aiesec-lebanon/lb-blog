@@ -49,8 +49,8 @@ export default function PostDetail({ postId }: Props) {
         getComments(safePostId),
       ])
 
-      setPost(postResponse.post)
-      setComments(commentsResponse.comments)
+      setPost(postResponse)
+      setComments(commentsResponse)
     } catch (requestError) {
       const message = requestError instanceof ApiClientError
         ? requestError.status === 404
@@ -71,7 +71,7 @@ export default function PostDetail({ postId }: Props) {
     if (!safePostId) return
 
     const response = await getComments(safePostId)
-    setComments(response.comments)
+    setComments(response)
   }
 
   async function handleDeletePost() {

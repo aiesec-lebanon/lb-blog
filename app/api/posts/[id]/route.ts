@@ -96,7 +96,7 @@ export async function GET(
       return notFoundResponse()
     }
 
-    return NextResponse.json({ post })
+    return NextResponse.json(post)
   }
 
   if (!apiUrl) {
@@ -113,7 +113,7 @@ export async function GET(
       return notFoundResponse()
     }
 
-    return NextResponse.json({ post })
+    return NextResponse.json(post)
   } catch {
     return NextResponse.json(
       { error: "Unable to load the post" },
