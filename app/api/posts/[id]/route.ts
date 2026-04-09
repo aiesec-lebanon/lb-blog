@@ -8,6 +8,7 @@ import {
 } from "@/lib/mock-content-store"
 import { normalizePost } from "@/lib/content-normalizers"
 import type { UpdatePostInput } from "@/types/post-types"
+import type Post from "@/types/post-types"
 
 function notFoundResponse() {
   return NextResponse.json({ error: "Post not found" }, { status: 404 })
@@ -15,6 +16,62 @@ function notFoundResponse() {
 
 function unauthorizedResponse() {
   return NextResponse.json({ error: "You do not own this post" }, { status: 403 })
+}
+
+async function findPostFromList(apiUrl: string, id: string) {
+  const maxPages = 25
+
+  for (let page = 0; page < maxPages; page += 1) {
+    const response = await fetch(`${apiUrl}/posts?page=${page}`, {
+      next: { revalidate: 0 },
+    })
+
+    if (!response.ok) {
+      return null
+    }
+
+    const data = await response.json().catch(() => null)
+    const rawPosts = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.posts)
+        ? data.posts
+        : Array.isArray(data?.data)
+          ? data.data
+          : []
+
+    const posts: Post[] = rawPosts.map((item: any, index: number) =>
+      normalizePost(item, String(page * 25 + index + 1))
+    )
+
+    const match = posts.find((post) => String(post.id) === String(id))
+
+    if (match) {
+      return match
+    }
+
+    if (posts.length < 25) {
+      break
+    }
+  }
+
+  return null
+}
+
+async function getBackendPostById(apiUrl: string, id: string) {
+  const response = await fetch(`${apiUrl}/posts/${id}`, {
+    next: { revalidate: 0 },
+  })
+
+  if (response.ok) {
+    const data = await response.json().catch(() => null)
+    return normalizePost(data?.post ?? data?.data ?? data, id)
+  }
+
+  if (response.status !== 404) {
+    return null
+  }
+
+  return findPostFromList(apiUrl, id)
 }
 
 export async function GET(
@@ -42,17 +99,11 @@ export async function GET(
   }
 
   try {
-    const response = await fetch(`${apiUrl}/posts/${id}`, {
-      next: { revalidate: 60 },
-    })
+    const post = await getBackendPostById(apiUrl, id)
 
-    if (!response.ok) {
-      const message = await readBackendError(response)
-      return NextResponse.json({ error: message }, { status: response.status })
+    if (!post) {
+      return notFoundResponse()
     }
-
-    const data = await response.json().catch(() => null)
-    const post = normalizePost(data?.post ?? data?.data ?? data, id)
 
     return NextResponse.json({ post })
   } catch {
@@ -113,17 +164,11 @@ export async function PUT(
       )
     }
 
-    const existingResponse = await fetch(`${apiUrl}/posts/${id}`, {
-      next: { revalidate: 0 },
-    })
+    const existingPost = await getBackendPostById(apiUrl, id)
 
-    if (!existingResponse.ok) {
-      const message = await readBackendError(existingResponse)
-      return NextResponse.json({ error: message }, { status: existingResponse.status })
+    if (!existingPost) {
+      return notFoundResponse()
     }
-
-    const existingData = await existingResponse.json().catch(() => null)
-    const existingPost = normalizePost(existingData?.post ?? existingData?.data ?? existingData, id)
 
     if (String(existingPost.expa_id) !== String(user.id)) {
       return unauthorizedResponse()
@@ -197,17 +242,11 @@ export async function DELETE(
   }
 
   try {
-    const existingResponse = await fetch(`${apiUrl}/posts/${id}`, {
-      next: { revalidate: 0 },
-    })
+    const existingPost = await getBackendPostById(apiUrl, id)
 
-    if (!existingResponse.ok) {
-      const message = await readBackendError(existingResponse)
-      return NextResponse.json({ error: message }, { status: existingResponse.status })
+    if (!existingPost) {
+      return notFoundResponse()
     }
-
-    const existingData = await existingResponse.json().catch(() => null)
-    const existingPost = normalizePost(existingData?.post ?? existingData?.data ?? existingData, id)
 
     if (String(existingPost.expa_id) !== String(user.id)) {
       return unauthorizedResponse()
