@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "../context/auth-context"
 import { ApiClientError, deletePost, getComments, getPost } from "@/lib/api-client"
@@ -12,7 +12,7 @@ import CommentItem from "./comment-item"
 import { formatDate } from "../lib/utils"
 
 type Props = {
-  postId: string
+  postId: string | undefined
 }
 
 export default function PostDetail({ postId }: Props) {
@@ -24,16 +24,27 @@ export default function PostDetail({ postId }: Props) {
   const [error, setError] = useState("")
   const [deleting, setDeleting] = useState(false)
 
+  const safePostId = useMemo(() => {
+    const n = Number(postId)
+    return Number.isInteger(n) && n > 0 ? String(n) : null
+  }, [postId])
+
   const isOwner = !!post && !!user && String(post.expa_id) === String(user.id)
 
   async function loadData() {
+    if (!safePostId) {
+      setError("Invalid post id")
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     setError("")
 
     try {
       const [postResponse, commentsResponse] = await Promise.all([
-        getPost(postId),
-        getComments(postId),
+        getPost(safePostId),
+        getComments(safePostId),
       ])
 
       setPost(postResponse.post)
@@ -50,15 +61,18 @@ export default function PostDetail({ postId }: Props) {
 
   useEffect(() => {
     void loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postId])
+  }, [safePostId])
 
   async function refreshComments() {
-    const response = await getComments(postId)
+    if (!safePostId) return
+
+    const response = await getComments(safePostId)
     setComments(response.comments)
   }
 
   async function handleDeletePost() {
+    if (!safePostId) return
+
     const confirmed = window.confirm("Delete this post?")
 
     if (!confirmed) {
@@ -67,7 +81,7 @@ export default function PostDetail({ postId }: Props) {
 
     setDeleting(true)
     try {
-      await deletePost(postId)
+      await deletePost(safePostId)
       router.push("/posts")
     } catch (requestError) {
       setError(requestError instanceof ApiClientError ? requestError.message : "Unable to delete the post")
