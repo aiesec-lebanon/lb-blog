@@ -15,6 +15,15 @@ function getPagination(req: NextRequest) {
   return { page, limit }
 }
 
+function isDeletedPost(item: any) {
+  if (item?.deleted === true || item?.is_deleted === true) {
+    return true
+  }
+
+  const deletedAt = item?.deleted_at
+  return typeof deletedAt === "string" && deletedAt.trim().length > 0
+}
+
 export async function GET(req: NextRequest) {
   const { page, limit } = getPagination(req)
   const apiUrl = process.env.API_URL
@@ -32,8 +41,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const response = await fetch(`${apiUrl}/posts?page=${page}`, {
-      next: { revalidate: 60 },
+    const response = await fetch(`${apiUrl}/posts?page=${page}&limit=${limit}`, {
+      cache: "no-store",
     })
 
     if (!response.ok) {
@@ -50,9 +59,11 @@ export async function GET(req: NextRequest) {
           ? data.data
           : []
 
-    const posts = rawPosts.map((item: any) =>
+    const posts = rawPosts
+      .filter((item: any) => !isDeletedPost(item))
+      .map((item: any) =>
       normalizePost(item)
-    )
+      )
 
     return NextResponse.json(buildPostListResponse(posts, limit))
   } catch {

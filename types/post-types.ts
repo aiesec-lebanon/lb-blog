@@ -6,6 +6,8 @@ export default interface Post {
   expa_id: string;
   created_at: string;
   updated_at?: string;
+  deleted_at?: string | null;
+  deleted?: boolean;
   image_url?: string;
   timestamp?: string;
   author?: string;

@@ -56,6 +56,8 @@ export function normalizePost(item: any, fallbackId?: string): Post {
     expa_id: expaId,
     created_at: createdAt,
     updated_at: item?.updated_at || undefined,
+    deleted_at: item?.deleted_at ?? null,
+    deleted: item?.deleted === true || item?.is_deleted === true,
     image_url: item?.image_url || item?.image || undefined,
     timestamp: item?.timestamp || createdAt,
     author: item?.author || username,
