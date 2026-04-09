@@ -1,5 +1,8 @@
 "use client"
 
+import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
+
 type Props = {
   open: boolean
   title: string
@@ -21,11 +24,33 @@ export default function ConfirmModal({
   onConfirm,
   onCancel,
 }: Props) {
-  if (!open) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    return () => setMounted(false)
+  }, [])
+
+  useEffect(() => {
+    if (!open || !mounted || loading) {
+      return
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onCancel()
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [open, mounted, loading, onCancel])
+
+  if (!open || !mounted) {
     return null
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={loading ? undefined : onCancel} />
 
@@ -53,6 +78,7 @@ export default function ConfirmModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
