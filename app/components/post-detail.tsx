@@ -9,6 +9,7 @@ import Comment from "@/types/comment-types"
 import Post from "@/types/post-types"
 import CommentForm from "./comment-form"
 import CommentItem from "./comment-item"
+import ConfirmModal from "./confirm-modal"
 import { formatDate } from "../lib/utils"
 
 type Props = {
@@ -23,6 +24,7 @@ export default function PostDetail({ postId }: Props) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [deleting, setDeleting] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const safePostId = useMemo(() => {
     const n = Number(postId)
@@ -75,12 +77,6 @@ export default function PostDetail({ postId }: Props) {
   async function handleDeletePost() {
     if (!safePostId) return
 
-    const confirmed = window.confirm("Delete this post?")
-
-    if (!confirmed) {
-      return
-    }
-
     setDeleting(true)
     try {
       await deletePost(safePostId)
@@ -89,6 +85,7 @@ export default function PostDetail({ postId }: Props) {
       setError(requestError instanceof ApiClientError ? requestError.message : "Unable to delete the post")
     } finally {
       setDeleting(false)
+      setShowDeleteModal(false)
     }
   }
 
@@ -132,7 +129,7 @@ export default function PostDetail({ postId }: Props) {
               </Link>
               <button
                 type="button"
-                onClick={handleDeletePost}
+                onClick={() => setShowDeleteModal(true)}
                 disabled={deleting}
                 className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-700 disabled:opacity-60"
               >
@@ -172,6 +169,16 @@ export default function PostDetail({ postId }: Props) {
           </div>
         )}
       </section>
+
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete this post?"
+        message="This action cannot be undone."
+        confirmText="Delete"
+        loading={deleting}
+        onConfirm={handleDeletePost}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </main>
   )
 }

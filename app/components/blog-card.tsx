@@ -6,6 +6,7 @@ import Post from "@/types/post-types"
 import { ApiClientError, deletePost } from "@/lib/api-client"
 import { clampBody, formatDate, truncate } from "../lib/utils"
 import { useAuth } from "../context/auth-context"
+import ConfirmModal from "./confirm-modal"
 
 type Props = {
   post: Post
@@ -16,6 +17,7 @@ export default function BlogCard({ post, onDeleted }: Props) {
   const { user } = useAuth()
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState("")
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const isOwner = useMemo(
     () => !!user && String(post.expa_id) === String(user.id),
@@ -23,12 +25,6 @@ export default function BlogCard({ post, onDeleted }: Props) {
   )
 
   async function handleDelete() {
-    const confirmed = window.confirm("Delete this post?")
-
-    if (!confirmed) {
-      return
-    }
-
     setDeleting(true)
     setError("")
 
@@ -42,6 +38,7 @@ export default function BlogCard({ post, onDeleted }: Props) {
       setError(message)
     } finally {
       setDeleting(false)
+      setShowDeleteModal(false)
     }
   }
 
@@ -108,7 +105,7 @@ export default function BlogCard({ post, onDeleted }: Props) {
             <button
               type="button"
               className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-700 disabled:opacity-60"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteModal(true)}
               disabled={deleting}
             >
               {deleting ? "Deleting..." : "Delete"}
@@ -116,6 +113,16 @@ export default function BlogCard({ post, onDeleted }: Props) {
           </>
         )}
       </div>
+
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete this post?"
+        message="This action cannot be undone."
+        confirmText="Delete"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
 
     </div>
   )
