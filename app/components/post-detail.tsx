@@ -26,7 +26,7 @@ export default function PostDetail({ postId }: Props) {
     return Number.isInteger(n) && n > 0 ? String(n) : null
   }, [postId])
 
-  const isOwner = !!post && !!user && String(post.expa_id) === String(user.id)
+  const isOwner = !!post && !!user && Number(post.expa_id) === Number(user.id)
 
   async function loadData() {
     if (!safePostId) {

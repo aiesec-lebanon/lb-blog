@@ -144,6 +144,8 @@ export async function PUT(
 
   try {
     const body = (await req.json()) as UpdatePostInput
+    const sessionUsername = getRequestUsername(user)
+    const imageUrl = body.image_url?.trim() || undefined
 
     if (!body.title?.trim() || !body.body?.trim()) {
       return NextResponse.json(
@@ -166,7 +168,7 @@ export async function PUT(
       const post = updateMockPost(postId, {
         title: body.title.trim(),
         body: body.body.trim(),
-        image_url: body.image_url?.trim() || undefined,
+        image_url: imageUrl,
       })
 
       return NextResponse.json({ success: true, post })
@@ -197,8 +199,8 @@ export async function PUT(
       body: JSON.stringify({
         title: body.title.trim(),
         body: body.body.trim(),
-        image_url: body.image_url?.trim() || undefined,
-        username: getRequestUsername(user),
+        image_url: imageUrl,
+        username: sessionUsername,
         expa_id: user.id,
       }),
     })
@@ -209,7 +211,18 @@ export async function PUT(
     }
 
     const data = await response.json().catch(() => null)
-    const post = normalizePost(data?.post ?? data?.data ?? data, postId)
+    const normalizedFromBackend = data ? normalizePost(data?.post ?? data?.data ?? data, postId) : null
+    const post = normalizedFromBackend && normalizedFromBackend.title
+      ? normalizedFromBackend
+      : {
+          ...existingPost,
+          title: body.title.trim(),
+          body: body.body.trim(),
+          image_url: imageUrl,
+          username: sessionUsername,
+          expa_id: String(user.id),
+          updated_at: new Date().toISOString(),
+        }
 
     return NextResponse.json({ success: true, post })
   } catch {

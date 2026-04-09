@@ -1,11 +1,16 @@
 import PostForm from "../../../components/post-form"
 
 type Props = {
-  params: { id: string }
+  params: Promise<{ id?: string }>
 }
 
-export default function EditPostPage({ params }: Props) {
-  const { id } = params
+export default async function EditPostPage({ params }: Props) {
+  const { id } = await params
+
+  if (!id) {
+    return <PostForm mode="edit" />
+  }
+
   const parsedId = Number(id)
 
   if (!Number.isInteger(parsedId) || parsedId <= 0) {

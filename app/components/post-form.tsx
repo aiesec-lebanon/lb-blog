@@ -19,6 +19,7 @@ export default function PostForm({ mode, postId }: Props) {
   const [title, setTitle] = useState("")
   const [authorName, setAuthorName] = useState("")
   const [body, setBody] = useState("")
+  const [imageUrl, setImageUrl] = useState("")
   const [loading, setLoading] = useState(mode === "edit")
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
@@ -34,7 +35,7 @@ export default function PostForm({ mode, postId }: Props) {
     const parsed = Number(postId)
     return Number.isInteger(parsed) && parsed > 0 ? String(parsed) : null
   }, [isEditMode, postId])
-  const isOwner = !isEditMode || !loadedOwnerId || String(loadedOwnerId) === String(user?.id || "")
+  const isOwner = !isEditMode || !loadedOwnerId || Number(loadedOwnerId) === Number(user?.id || "")
   const canSubmit = !authLoading && !!user && !saving && !loading && isOwner && (!isEditMode || !!safePostId)
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function PostForm({ mode, postId }: Props) {
 
         setTitle(data.title)
         setBody(data.body)
+        setImageUrl(data.image_url || "")
         setLoadedOwnerId(data.expa_id)
         setError("")
       } catch (requestError) {
@@ -85,6 +87,12 @@ export default function PostForm({ mode, postId }: Props) {
     event.preventDefault()
     setError("")
     setSuccess("")
+
+    if (!user) {
+      setError("Sign in to create or edit posts.")
+      return
+    }
+
     setSaving(true)
 
     try {
@@ -97,11 +105,15 @@ export default function PostForm({ mode, postId }: Props) {
         const response = await updatePost(safePostId, {
           title: title.trim(),
           body: body.trim(),
-          image_url: undefined,
+          image_url: imageUrl.trim() || undefined,
+          username: user.username || user.full_name?.trim() || "",
+          expa_id: String(user.id),
         })
 
         setSuccess("Post updated successfully.")
-        router.push(`/posts/${response.post?.id || safePostId}`)
+        const targetId = response.post?.id || safePostId
+        router.push(`/posts/${targetId}`)
+        router.refresh()
         return
       }
 

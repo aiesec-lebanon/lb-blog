@@ -26,6 +26,8 @@ export interface UpdatePostInput {
   title: string;
   body: string;
   image_url?: string;
+  username?: string;
+  expa_id?: string;
 }
 
 export interface ApiErrorResponse {

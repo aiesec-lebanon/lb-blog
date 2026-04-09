@@ -20,7 +20,7 @@ export default function BlogCard({ post, onDeleted }: Props) {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const isOwner = useMemo(
-    () => !!user && String(post.expa_id) === String(user.id),
+    () => !!user && Number(post.expa_id) === Number(user.id),
     [post.expa_id, user]
   )
 
