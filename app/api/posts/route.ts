@@ -117,20 +117,35 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const response = await fetch(`${apiUrl}/posts`, {
+    const basePayload = {
+      title: body.title.trim(),
+      body: body.body.trim(),
+      image_url: body.image_url?.trim() || undefined,
+      username: sessionUsername,
+      expa_id: user.id,
+    }
+
+    let response = await fetch(`${apiUrl}/posts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        title: body.title.trim(),
-        body: body.body.trim(),
-        image_url: body.image_url?.trim() || undefined,
-        username: sessionUsername,
+        ...basePayload,
         author: selectedAuthor,
-        expa_id: user.id,
       }),
     })
+
+    // Some backends validate strict schemas and may reject unknown fields.
+    if (!response.ok && response.status >= 500) {
+      response = await fetch(`${apiUrl}/posts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(basePayload),
+      })
+    }
 
     if (!response.ok) {
       const message = await readBackendError(response)
