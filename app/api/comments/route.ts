@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const response = await fetch(`${apiUrl}/comments?post_id=${safePostId}`, {
-      next: { revalidate: 30 },
+      cache: "no-store",
     })
 
     if (!response.ok) {
