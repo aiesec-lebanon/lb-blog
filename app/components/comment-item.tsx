@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import Comment from "@/types/comment-types"
 import { ApiClientError, deleteComment, updateComment } from "@/lib/api-client"
-import { formatDateTime } from "../lib/utils"
+import { formatDate } from "../lib/utils"
 import ConfirmModal from "./confirm-modal"
 
 type Props = {
@@ -20,7 +20,7 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
   const [error, setError] = useState("")
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const displayDate = useMemo(() => formatDateTime(comment.updated_at || comment.created_at), [comment.updated_at, comment.created_at])
+  const displayDate = useMemo(() => formatDate(comment.updated_at || comment.created_at), [comment.updated_at, comment.created_at])
   const isDeleted = comment.is_deleted === true
 
   async function handleSave() {
