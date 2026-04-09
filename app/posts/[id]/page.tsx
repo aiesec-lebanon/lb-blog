@@ -6,6 +6,11 @@ type Props = {
 
 export default function PostPage({ params }: Props) {
   const { id } = params
+  const parsedId = Number(id)
 
-  return <PostDetail postId={id} />
+  if (!Number.isInteger(parsedId) || parsedId <= 0) {
+    return <PostDetail postId={undefined} />
+  }
+
+  return <PostDetail postId={String(parsedId)} />
 }

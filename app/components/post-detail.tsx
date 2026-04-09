@@ -51,7 +51,9 @@ export default function PostDetail({ postId }: Props) {
       setComments(commentsResponse.comments)
     } catch (requestError) {
       const message = requestError instanceof ApiClientError
-        ? requestError.message
+        ? requestError.status === 404
+          ? "Post not found"
+          : requestError.message
         : "Unable to load the post"
       setError(message)
     } finally {

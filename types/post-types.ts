@@ -15,11 +15,17 @@ export default interface Post {
 export interface CreatePostInput {
   title: string;
   body: string;
+  image_url?: string;
 }
 
 export interface UpdatePostInput {
   title: string;
   body: string;
+  image_url?: string;
+}
+
+export interface ApiErrorResponse {
+  error: string;
 }
 
 export interface PostListResponse {

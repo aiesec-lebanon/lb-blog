@@ -6,6 +6,11 @@ type Props = {
 
 export default function EditPostPage({ params }: Props) {
   const { id } = params
+  const parsedId = Number(id)
 
-  return <PostForm mode="edit" postId={id} />
+  if (!Number.isInteger(parsedId) || parsedId <= 0) {
+    return <PostForm mode="edit" />
+  }
+
+  return <PostForm mode="edit" postId={String(parsedId)} />
 }

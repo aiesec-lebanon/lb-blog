@@ -25,21 +25,29 @@ export default function PostForm({ mode, postId }: Props) {
   const [loadedOwnerId, setLoadedOwnerId] = useState("")
 
   const isEditMode = useMemo(() => mode === "edit", [mode])
+  const safePostId = useMemo(() => {
+    if (!isEditMode || !postId) {
+      return null
+    }
+
+    const parsed = Number(postId)
+    return Number.isInteger(parsed) && parsed > 0 ? String(parsed) : null
+  }, [isEditMode, postId])
   const isOwner = !isEditMode || !loadedOwnerId || String(loadedOwnerId) === String(user?.id || "")
-  const canSubmit = !authLoading && !!user && !saving && !loading && isOwner
+  const canSubmit = !authLoading && !!user && !saving && !loading && isOwner && (!isEditMode || !!safePostId)
 
   useEffect(() => {
     let ignore = false
 
     async function loadExistingPost() {
-      if (!isEditMode || !postId) {
+      if (!isEditMode || !safePostId) {
         setLoading(false)
         return
       }
 
       try {
         setLoading(true)
-        const data = await getPost(postId)
+        const data = await getPost(safePostId)
 
         if (ignore) {
           return
@@ -70,7 +78,7 @@ export default function PostForm({ mode, postId }: Props) {
     return () => {
       ignore = true
     }
-  }, [isEditMode, postId])
+  }, [isEditMode, safePostId])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -80,13 +88,19 @@ export default function PostForm({ mode, postId }: Props) {
 
     try {
       if (isEditMode) {
-        const response = await updatePost(postId || "", {
+        if (!safePostId) {
+          setError("Invalid post id")
+          return
+        }
+
+        const response = await updatePost(safePostId, {
           title: title.trim(),
           body: body.trim(),
+          image_url: undefined,
         })
 
         setSuccess("Post updated successfully.")
-        router.push(`/posts/${response.post?.id || postId}`)
+        router.push(`/posts/${response.post?.id || safePostId}`)
         return
       }
 

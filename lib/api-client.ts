@@ -1,5 +1,6 @@
 import Post, { CreatePostInput, UpdatePostInput } from "@/types/post-types"
 import Comment, { CreateCommentInput, UpdateCommentInput } from "@/types/comment-types"
+import type { ApiErrorResponse } from "@/types/post-types"
 
 export class ApiClientError extends Error {
   status: number
@@ -11,9 +12,7 @@ export class ApiClientError extends Error {
   }
 }
 
-type ApiResponse<T> = T & {
-  error?: string
-}
+type ApiResponse<T> = T & Partial<ApiErrorResponse>
 
 async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {

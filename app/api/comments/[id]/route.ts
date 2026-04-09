@@ -4,11 +4,12 @@ import { getRequestUser } from "@/server-utils/session"
 import {
   deleteMockComment,
   getMockCommentById,
-  listMockComments,
   updateMockComment,
 } from "@/lib/mock-content-store"
 import { normalizeComment } from "@/lib/content-normalizers"
+import type Comment from "@/types/comment-types"
 import type { UpdateCommentInput } from "@/types/comment-types"
+import { parsePositiveInt } from "@/server-utils/ids"
 
 function notFoundResponse() {
   return NextResponse.json({ error: "Comment not found" }, { status: 404 })
@@ -27,20 +28,26 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+  const parsedCommentId = parsePositiveInt(id)
   const apiUrl = process.env.API_URL
   const useMockData = process.env.USE_MOCK_DATA === "true"
   const user = getRequestUser(req)
   const postId = getPostIdFromRequest(req)
+  const parsedPostId = parsePositiveInt(postId)
+
+  if (!parsedCommentId) {
+    return NextResponse.json({ error: "Invalid comment id" }, { status: 400 })
+  }
+
+  if (!parsedPostId) {
+    return NextResponse.json({ error: "Invalid post_id" }, { status: 400 })
+  }
+
+  const safeCommentId = String(parsedCommentId)
+  const safePostId = String(parsedPostId)
 
   if (!user) {
     return NextResponse.json({ error: "Login required" }, { status: 401 })
-  }
-
-  if (!postId) {
-    return NextResponse.json(
-      { error: "post_id is required for comment updates" },
-      { status: 400 }
-    )
   }
 
   try {
@@ -55,7 +62,7 @@ export async function PUT(
 
     // TODO: Replace cookie-based ownership checks with verified backend/session auth.
     if (useMockData) {
-      const existing = getMockCommentById(id)
+      const existing = getMockCommentById(safeCommentId)
       if (!existing) {
         return notFoundResponse()
       }
@@ -64,19 +71,19 @@ export async function PUT(
         return unauthorizedResponse()
       }
 
-      const comment = updateMockComment(id, { body: body.body.trim() })
+      const comment = updateMockComment(safeCommentId, { body: body.body.trim() })
 
       return NextResponse.json({ success: true, comment })
     }
 
     if (!apiUrl) {
       return NextResponse.json(
-        { error: "API_URL is not configured" },
+        { error: "Missing API_URL" },
         { status: 500 }
       )
     }
 
-    const commentsResponse = await fetch(`${apiUrl}/comments?post_id=${postId}`, {
+    const commentsResponse = await fetch(`${apiUrl}/comments?post_id=${safePostId}`, {
       next: { revalidate: 0 },
     })
 
@@ -94,9 +101,10 @@ export async function PUT(
           ? commentsData.data
           : []
 
-    const existingComment = rawComments
+    const normalizedComments: Comment[] = rawComments
       .map((item: any, index: number) => normalizeComment(item, String(index + 1)))
-      .find((comment: any) => comment.id === id)
+
+    const existingComment = normalizedComments.find((comment) => comment.id === safeCommentId)
 
     if (!existingComment) {
       return notFoundResponse()
@@ -106,7 +114,7 @@ export async function PUT(
       return unauthorizedResponse()
     }
 
-    const response = await fetch(`${apiUrl}/comments/${id}`, {
+    const response = await fetch(`${apiUrl}/comments/${safeCommentId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -120,7 +128,7 @@ export async function PUT(
     }
 
     const data = await response.json().catch(() => null)
-    const comment = normalizeComment(data?.comment ?? data?.data ?? data, id)
+    const comment = normalizeComment(data?.comment ?? data?.data ?? data, safeCommentId)
 
     return NextResponse.json({ success: true, comment })
   } catch {
@@ -136,25 +144,31 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+  const parsedCommentId = parsePositiveInt(id)
   const apiUrl = process.env.API_URL
   const useMockData = process.env.USE_MOCK_DATA === "true"
   const user = getRequestUser(req)
   const postId = getPostIdFromRequest(req)
+  const parsedPostId = parsePositiveInt(postId)
+
+  if (!parsedCommentId) {
+    return NextResponse.json({ error: "Invalid comment id" }, { status: 400 })
+  }
+
+  if (!parsedPostId) {
+    return NextResponse.json({ error: "Invalid post_id" }, { status: 400 })
+  }
+
+  const safeCommentId = String(parsedCommentId)
+  const safePostId = String(parsedPostId)
 
   if (!user) {
     return NextResponse.json({ error: "Login required" }, { status: 401 })
   }
 
-  if (!postId) {
-    return NextResponse.json(
-      { error: "post_id is required for comment deletion" },
-      { status: 400 }
-    )
-  }
-
   // TODO: Replace cookie-based ownership checks with verified backend/session auth.
   if (useMockData) {
-    const existing = getMockCommentById(id)
+    const existing = getMockCommentById(safeCommentId)
     if (!existing) {
       return notFoundResponse()
     }
@@ -163,20 +177,20 @@ export async function DELETE(
       return unauthorizedResponse()
     }
 
-    deleteMockComment(id)
+    deleteMockComment(safeCommentId)
 
     return NextResponse.json({ success: true })
   }
 
   if (!apiUrl) {
     return NextResponse.json(
-      { error: "API_URL is not configured" },
+      { error: "Missing API_URL" },
       { status: 500 }
     )
   }
 
   try {
-    const commentsResponse = await fetch(`${apiUrl}/comments?post_id=${postId}`, {
+    const commentsResponse = await fetch(`${apiUrl}/comments?post_id=${safePostId}`, {
       next: { revalidate: 0 },
     })
 
@@ -194,9 +208,10 @@ export async function DELETE(
           ? commentsData.data
           : []
 
-    const existingComment = rawComments
+    const normalizedComments: Comment[] = rawComments
       .map((item: any, index: number) => normalizeComment(item, String(index + 1)))
-      .find((comment: any) => comment.id === id)
+
+    const existingComment = normalizedComments.find((comment) => comment.id === safeCommentId)
 
     if (!existingComment) {
       return notFoundResponse()
@@ -206,7 +221,7 @@ export async function DELETE(
       return unauthorizedResponse()
     }
 
-    const response = await fetch(`${apiUrl}/comments/${id}`, {
+    const response = await fetch(`${apiUrl}/comments/${safeCommentId}`, {
       method: "DELETE",
     })
 

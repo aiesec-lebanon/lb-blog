@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
   if (!apiUrl) {
     return NextResponse.json(
-      { error: "API_URL is not configured" },
+      { error: "Missing API_URL" },
       { status: 500 }
     )
   }
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: message }, { status: response.status })
     }
 
-    const data = await response.json()
+    const data = await response.json().catch(() => null)
     const rawPosts = Array.isArray(data)
       ? data
       : Array.isArray(data?.posts)
@@ -87,6 +87,7 @@ export async function POST(req: NextRequest) {
         {
           title: body.title.trim(),
           body: body.body.trim(),
+          image_url: body.image_url?.trim() || undefined,
         },
         user
       )
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     if (!apiUrl) {
       return NextResponse.json(
-        { error: "API_URL is not configured" },
+        { error: "Missing API_URL" },
         { status: 500 }
       )
     }
@@ -109,6 +110,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         title: body.title.trim(),
         body: body.body.trim(),
+        image_url: body.image_url?.trim() || undefined,
         username: getRequestUsername(user),
         expa_id: user.id,
       }),

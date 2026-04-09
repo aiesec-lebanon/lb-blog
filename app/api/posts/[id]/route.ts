@@ -9,6 +9,7 @@ import {
 import { normalizePost } from "@/lib/content-normalizers"
 import type { UpdatePostInput } from "@/types/post-types"
 import type Post from "@/types/post-types"
+import { parsePositiveInt } from "@/server-utils/ids"
 
 function notFoundResponse() {
   return NextResponse.json({ error: "Post not found" }, { status: 404 })
@@ -79,11 +80,18 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+  const parsedId = parsePositiveInt(id)
   const apiUrl = process.env.API_URL
   const useMockData = process.env.USE_MOCK_DATA === "true"
 
+  if (!parsedId) {
+    return NextResponse.json({ error: "Invalid post id" }, { status: 400 })
+  }
+
+  const postId = String(parsedId)
+
   if (useMockData) {
-    const post = getMockPostById(id)
+    const post = getMockPostById(postId)
     if (!post) {
       return notFoundResponse()
     }
@@ -93,13 +101,13 @@ export async function GET(
 
   if (!apiUrl) {
     return NextResponse.json(
-      { error: "API_URL is not configured" },
+      { error: "Missing API_URL" },
       { status: 500 }
     )
   }
 
   try {
-    const post = await getBackendPostById(apiUrl, id)
+    const post = await getBackendPostById(apiUrl, postId)
 
     if (!post) {
       return notFoundResponse()
@@ -119,9 +127,16 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+  const parsedId = parsePositiveInt(id)
   const apiUrl = process.env.API_URL
   const useMockData = process.env.USE_MOCK_DATA === "true"
   const user = getRequestUser(req)
+
+  if (!parsedId) {
+    return NextResponse.json({ error: "Invalid post id" }, { status: 400 })
+  }
+
+  const postId = String(parsedId)
 
   if (!user) {
     return NextResponse.json({ error: "Login required" }, { status: 401 })
@@ -139,7 +154,7 @@ export async function PUT(
 
     // TODO: Replace cookie-based ownership checks with verified backend/session auth.
     if (useMockData) {
-      const existing = getMockPostById(id)
+      const existing = getMockPostById(postId)
       if (!existing) {
         return notFoundResponse()
       }
@@ -148,9 +163,10 @@ export async function PUT(
         return unauthorizedResponse()
       }
 
-      const post = updateMockPost(id, {
+      const post = updateMockPost(postId, {
         title: body.title.trim(),
         body: body.body.trim(),
+        image_url: body.image_url?.trim() || undefined,
       })
 
       return NextResponse.json({ success: true, post })
@@ -158,12 +174,12 @@ export async function PUT(
 
     if (!apiUrl) {
       return NextResponse.json(
-        { error: "API_URL is not configured" },
+        { error: "Missing API_URL" },
         { status: 500 }
       )
     }
 
-    const existingPost = await getBackendPostById(apiUrl, id)
+    const existingPost = await getBackendPostById(apiUrl, postId)
 
     if (!existingPost) {
       return notFoundResponse()
@@ -173,7 +189,7 @@ export async function PUT(
       return unauthorizedResponse()
     }
 
-    const response = await fetch(`${apiUrl}/posts/${id}`, {
+    const response = await fetch(`${apiUrl}/posts/${postId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -181,6 +197,7 @@ export async function PUT(
       body: JSON.stringify({
         title: body.title.trim(),
         body: body.body.trim(),
+        image_url: body.image_url?.trim() || undefined,
         username: getRequestUsername(user),
         expa_id: user.id,
       }),
@@ -192,7 +209,7 @@ export async function PUT(
     }
 
     const data = await response.json().catch(() => null)
-    const post = normalizePost(data?.post ?? data?.data ?? data, id)
+    const post = normalizePost(data?.post ?? data?.data ?? data, postId)
 
     return NextResponse.json({ success: true, post })
   } catch {
@@ -208,9 +225,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+  const parsedId = parsePositiveInt(id)
   const apiUrl = process.env.API_URL
   const useMockData = process.env.USE_MOCK_DATA === "true"
   const user = getRequestUser(req)
+
+  if (!parsedId) {
+    return NextResponse.json({ error: "Invalid post id" }, { status: 400 })
+  }
+
+  const postId = String(parsedId)
 
   if (!user) {
     return NextResponse.json({ error: "Login required" }, { status: 401 })
@@ -218,7 +242,7 @@ export async function DELETE(
 
   // TODO: Replace cookie-based ownership checks with verified backend/session auth.
   if (useMockData) {
-    const existing = getMockPostById(id)
+    const existing = getMockPostById(postId)
     if (!existing) {
       return notFoundResponse()
     }
@@ -227,20 +251,20 @@ export async function DELETE(
       return unauthorizedResponse()
     }
 
-    deleteMockPost(id)
+    deleteMockPost(postId)
 
     return NextResponse.json({ success: true })
   }
 
   if (!apiUrl) {
     return NextResponse.json(
-      { error: "API_URL is not configured" },
+      { error: "Missing API_URL" },
       { status: 500 }
     )
   }
 
   try {
-    const existingPost = await getBackendPostById(apiUrl, id)
+    const existingPost = await getBackendPostById(apiUrl, postId)
 
     if (!existingPost) {
       return notFoundResponse()
@@ -250,11 +274,12 @@ export async function DELETE(
       return unauthorizedResponse()
     }
 
-    const response = await fetch(`${apiUrl}/posts/${id}`, {
+    const response = await fetch(`${apiUrl}/posts/${postId}?expa_id=${encodeURIComponent(String(user.id))}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({ expa_id: user.id }),
     })
 
     if (!response.ok) {
