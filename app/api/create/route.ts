@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
     if (!user.id) {
       return NextResponse.redirect(new URL("/login", req.url))
     }
-    const expa_id = user.full_name.trim() + "-" + user.id
+    const expa_id = user.id
+    const username = user.full_name.trim()
 
     const API = process.env.API_URL
 
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ ...data, expa_id })
+      body: JSON.stringify({ ...data, expa_id, username })
     })
 
     if (!response.ok) {
