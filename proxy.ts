@@ -23,20 +23,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function proxy(req: NextRequest) {
 
-  const pathname = req.nextUrl.pathname;
-
-  // Keep public read paths accessible without auth.
-  if (
-    pathname === "/" ||
-    pathname === "/add" ||
-    pathname.startsWith("/posts") ||
-    pathname.startsWith("/api/posts") ||
-    pathname.startsWith("/api/comments") ||
-    pathname.startsWith("/api/blogs")
-  ) {
-    return NextResponse.next();
-  }
-
     /**
      * ------------------------------------------------------------
      * RETRIEVE AUTHENTICATION COOKIES
