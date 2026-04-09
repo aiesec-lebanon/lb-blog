@@ -1,10 +1,15 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 export default function CreateButton() {
 
   const router = useRouter()
+  const pathname = usePathname()
+
+  if (pathname === "/posts/new" || pathname === "/add") {
+    return null
+  }
 
   return (
     <button
