@@ -65,7 +65,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetch("/api/auth/me")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        setUser(data);
+        if (!data) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        setUser({
+          ...data,
+          username: data.username || data.full_name?.trim() || "",
+        });
         setLoading(false);
       });
   }, []);

@@ -18,6 +18,7 @@ export interface Position {
 export default interface UserInfo {
   id: string;
   full_name: string;
+  username?: string;
   profile_photo: string;
   current_positions: Position[];
 }

@@ -1,7 +1,49 @@
-import BlogPost from "../../types/blog-post"
-import { truncate } from "../lib/utils"
+"use client"
 
-export default function BlogCard({ post }: { post: BlogPost }) {
+import Link from "next/link"
+import { useMemo, useState } from "react"
+import Post from "@/types/post-types"
+import { ApiClientError, deletePost } from "@/lib/api-client"
+import { clampBody, formatDateTime, truncate } from "../lib/utils"
+import { useAuth } from "../context/auth-context"
+
+type Props = {
+  post: Post
+  onDeleted?: (postId: string) => void
+}
+
+export default function BlogCard({ post, onDeleted }: Props) {
+  const { user } = useAuth()
+  const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState("")
+
+  const isOwner = useMemo(
+    () => !!user && String(post.expa_id) === String(user.id),
+    [post.expa_id, user]
+  )
+
+  async function handleDelete() {
+    const confirmed = window.confirm("Delete this post?")
+
+    if (!confirmed) {
+      return
+    }
+
+    setDeleting(true)
+    setError("")
+
+    try {
+      await deletePost(post.id)
+      onDeleted?.(post.id)
+    } catch (requestError) {
+      const message = requestError instanceof ApiClientError
+        ? requestError.message
+        : "Unable to delete the post"
+      setError(message)
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   return (
     <div className="
@@ -16,37 +58,72 @@ export default function BlogCard({ post }: { post: BlogPost }) {
         overflow-hidden
       ">
 
-      <h2 className="font-semibold text-lg mb-2 break-words">
-        {truncate(post.title,120)}
-      </h2>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="font-semibold text-lg break-words text-gray-900">
+            {truncate(post.title, 120)}
+          </h2>
 
-      {post.image && (
+          <div className="mt-1 text-xs text-gray-500">
+            <span>{post.username || post.author}</span>
+            <span> • </span>
+            <span>{formatDateTime(post.created_at || post.timestamp || "")}</span>
+          </div>
+        </div>
+
+        {isOwner && (
+          <span className="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-700">
+            Yours
+          </span>
+        )}
+      </div>
+
+      {error && (
+        <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">
+          {error}
+        </div>
+      )}
+
+      <p className="mt-3 text-sm leading-6 text-gray-700">
+        {clampBody(post.body, 180)}
+      </p>
+
+      {(post.image_url || post.image) && (
         <img
-          src={post.image}
-          className="block rounded mb-3 w-full object-cover"
+          src={post.image_url || post.image || ""}
+          className="block mt-4 rounded-xl w-full object-cover"
           loading="lazy"
           alt={post.title}
         />
       )}
 
-      {post.body && (
-        <p className="text-sm text-gray-700 whitespace-pre-line break-words">
-          {post.body}
-        </p>
-      )}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Link
+          href={`/posts/${post.id}`}
+          className="rounded-lg bg-black px-3 py-2 text-xs font-medium text-white"
+        >
+          View
+        </Link>
 
-      <div className="text-xs text-gray-500 mt-3">
+        {isOwner && (
+          <>
+            <Link
+              href={`/posts/${post.id}/edit`}
+              className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700"
+            >
+              Edit
+            </Link>
 
-        {post.author && (
-          <span>{post.author}</span>
+            <button
+              type="button"
+              className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-700 disabled:opacity-60"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </button>
+          </>
         )}
-
-        {post.author && <span> • </span>}
-
-        <span>
-          {new Date(post.timestamp).toLocaleDateString()}
-        </span>
-
       </div>
 
     </div>

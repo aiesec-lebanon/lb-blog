@@ -1,37 +1,49 @@
 import { NextRequest, NextResponse } from "next/server"
-import BlogPost from "@/types/blog-post"
+import Post from "@/types/post-types"
+import { MOCK_BLOG_POSTS } from "@/lib/mock-blog-posts"
+import { normalizePost } from "@/lib/content-normalizers"
+
+function getMockPage(page: number, limit: number) {
+  const start = page * limit
+  const end = start + limit
+  const posts = MOCK_BLOG_POSTS.slice(start, end)
+
+  return {
+    posts,
+    hasMore: end < MOCK_BLOG_POSTS.length
+  }
+}
 
 export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url)
 
-    const page = Number(searchParams.get("page") || 0)
+    const pageValue = Number(searchParams.get("page") || 0)
+    const page = Number.isNaN(pageValue) || pageValue < 0 ? 0 : pageValue
     const limit = 25
 
     const API = process.env.API_URL
+    const useMockData = process.env.USE_MOCK_DATA === "true"
+
+    if (useMockData || !API) {
+      return NextResponse.json(getMockPage(page, limit))
+    }
 
     const res = await fetch(`${API}/posts?page=${page}`, {
       next: { revalidate: 60 }
     })
 
     if (!res.ok) {
-      return NextResponse.json(
-        { error: "Failed to fetch posts" },
-        { status: 500 }
-      )
+      return NextResponse.json(getMockPage(page, limit))
     }
 
     const data = await res.json()
+    const items = Array.isArray(data) ? data : []
 
-    // Transform to match frontend type
-    const posts: BlogPost[] = data.map((item: any) => ({
-      timestamp: item.created_at,
-      title: item.title,
-      body: item.body,
-      image: item.image_url || undefined,
-      author: item.author
-    }))
+    const posts: Post[] = items.map((item: any, index: number) =>
+      normalizePost(item, String(page * limit + index + 1))
+    )
 
     return NextResponse.json({
       posts,
@@ -39,9 +51,8 @@ export async function GET(req: NextRequest) {
     })
 
   } catch (err) {
-    return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
-    )
+    const page = 0
+    const limit = 25
+    return NextResponse.json(getMockPage(page, limit))
   }
 }

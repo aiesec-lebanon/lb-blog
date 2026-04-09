@@ -11,3 +11,13 @@ export function clampBody(text: string, max = 500) {
     ? text.slice(0, max) + "..."
     : text
 }
+
+export function formatDateTime(value: string) {
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return ""
+  }
+
+  return date.toLocaleString()
+}

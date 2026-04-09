@@ -8,7 +8,7 @@ export default function CreateButton() {
 
   return (
     <button
-      onClick={() => router.push("/add")}
+      onClick={() => router.push("/posts/new")}
       className="
         fixed 
         top-[14vh]

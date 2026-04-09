@@ -1,7 +1,5 @@
-export default interface BlogPost {
-  timestamp: string
-  title: string
-  body?: string
-  image?: string
-  author?: string
-}
+import type Post from "./post-types"
+
+type BlogPost = Post
+
+export default BlogPost
