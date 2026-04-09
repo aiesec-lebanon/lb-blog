@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import Comment from "@/types/comment-types"
 import { ApiClientError, deleteComment, updateComment } from "@/lib/api-client"
 import { formatDateTime } from "../lib/utils"
+import ConfirmModal from "./confirm-modal"
 
 type Props = {
   comment: Comment
@@ -17,8 +18,10 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
   const [saving, setSaving] = useState(false)
   const [removing, setRemoving] = useState(false)
   const [error, setError] = useState("")
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const displayDate = useMemo(() => formatDateTime(comment.updated_at || comment.created_at), [comment.updated_at, comment.created_at])
+  const isDeleted = comment.is_deleted === true
 
   async function handleSave() {
     setSaving(true)
@@ -41,12 +44,6 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
   }
 
   async function handleDelete() {
-    const confirmed = window.confirm("Delete this comment?")
-
-    if (!confirmed) {
-      return
-    }
-
     setRemoving(true)
     setError("")
 
@@ -60,6 +57,7 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
       setError(message)
     } finally {
       setRemoving(false)
+      setShowDeleteModal(false)
     }
   }
 
@@ -71,7 +69,13 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
           <p className="mt-1 text-xs text-gray-500">{displayDate}</p>
         </div>
 
-        {canEdit && !isEditing && (
+        {isDeleted && (
+          <span className="rounded-full bg-gray-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-gray-600">
+            Deleted
+          </span>
+        )}
+
+        {canEdit && !isEditing && !isDeleted && (
           <div className="flex gap-2">
             <button
               type="button"
@@ -83,7 +87,7 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
             <button
               type="button"
               className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 disabled:opacity-60"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteModal(true)}
               disabled={removing}
             >
               {removing ? "Deleting..." : "Delete"}
@@ -126,8 +130,20 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
           </div>
         </div>
       ) : (
-        <p className="mt-4 whitespace-pre-line text-sm leading-6 text-gray-700">{comment.body}</p>
+        <p className={`mt-4 whitespace-pre-line text-sm leading-6 ${isDeleted ? "italic text-gray-400" : "text-gray-700"}`}>
+          {isDeleted ? "This comment was deleted." : comment.body}
+        </p>
       )}
+
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete this comment?"
+        message="This action cannot be undone."
+        confirmText="Delete"
+        loading={removing}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </article>
   )
 }

@@ -180,8 +180,13 @@ export function updateMockComment(id: string, input: UpdateCommentInput) {
 
 export function deleteMockComment(id: string) {
   const store = getStore()
-  const existingLength = store.comments.length
-  store.comments = store.comments.filter((comment) => comment.id !== id)
+  const comment = store.comments.find((item) => item.id === id)
 
-  return store.comments.length !== existingLength
+  if (!comment) {
+    return false
+  }
+
+  comment.is_deleted = true
+  comment.updated_at = nowIso()
+  return true
 }

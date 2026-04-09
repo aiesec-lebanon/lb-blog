@@ -47,7 +47,7 @@ export default function PostDetail({ postId }: Props) {
       ])
 
       setPost(postResponse)
-      setComments(commentsResponse.filter((comment) => !comment.is_deleted))
+      setComments(commentsResponse)
     } catch (requestError) {
       const message = requestError instanceof ApiClientError
         ? requestError.status === 404
@@ -71,7 +71,7 @@ export default function PostDetail({ postId }: Props) {
     setCommentsLoading(true)
     try {
       const response = await getComments(safePostId)
-      setComments(response.filter((comment) => !comment.is_deleted))
+      setComments(response)
     } finally {
       setCommentsLoading(false)
     }

@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   const safePostId = String(parsedPostId)
 
   if (useMockData) {
-    return NextResponse.json(listMockComments(safePostId).filter((comment) => !comment.is_deleted))
+    return NextResponse.json(listMockComments(safePostId))
   }
 
   if (!apiUrl) {
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       normalizeComment(item, String(index + 1))
     )
 
-    return NextResponse.json(comments.filter((comment: { is_deleted?: boolean }) => !comment.is_deleted))
+    return NextResponse.json(comments)
   } catch {
     return NextResponse.json(
       { error: "Unable to load comments" },
