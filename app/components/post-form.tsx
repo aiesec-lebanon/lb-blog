@@ -189,24 +189,6 @@ export default function PostForm({ mode, postId }: Props) {
         )}
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          {!isEditMode && (
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="authorName">
-                Author Name
-              </label>
-              <input
-                id="authorName"
-                type="text"
-                value={authorName}
-                onChange={(event) => setAuthorName(event.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-black/30"
-                maxLength={80}
-                placeholder="Leave empty to publish as Anonymous"
-                disabled={!canSubmit}
-              />
-            </div>
-          )}
-
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="title">
               Title
@@ -237,6 +219,24 @@ export default function PostForm({ mode, postId }: Props) {
               required
             />
           </div>
+
+          {!isEditMode && (
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="authorName">
+                Author Name
+              </label>
+              <input
+                id="authorName"
+                type="text"
+                value={authorName}
+                onChange={(event) => setAuthorName(event.target.value)}
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-black/30"
+                maxLength={80}
+                placeholder="Leave empty to publish as Anonymous"
+                disabled={!canSubmit}
+              />
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-3 pt-2">
             <button

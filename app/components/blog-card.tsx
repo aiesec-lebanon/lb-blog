@@ -62,7 +62,7 @@ export default function BlogCard({ post, onDeleted }: Props) {
           </h2>
 
           <div className="mt-1 text-xs text-gray-500">
-            <span>{post.username || post.author}</span>
+            <span>Author: {post.author || post.username || "Anonymous"}</span>
             <span> • </span>
             <span>{formatDate(post.created_at || post.timestamp || "")}</span>
           </div>
