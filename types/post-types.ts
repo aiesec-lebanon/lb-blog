@@ -26,6 +26,7 @@ export interface UpdatePostInput {
   title: string;
   body: string;
   image_url?: string;
+  author?: string;
   username?: string;
   expa_id?: string;
 }

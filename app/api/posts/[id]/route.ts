@@ -169,6 +169,7 @@ export async function PUT(
         title: body.title.trim(),
         body: body.body.trim(),
         image_url: imageUrl,
+        author: body.author?.trim() || "Anonymous",
       })
 
       return NextResponse.json({ success: true, post })
@@ -191,6 +192,8 @@ export async function PUT(
       return unauthorizedResponse()
     }
 
+    const selectedAuthor = body.author?.trim() || existingPost.author || "Anonymous"
+
     const response = await fetch(`${apiUrl}/posts/${postId}`, {
       method: "PUT",
       headers: {
@@ -200,6 +203,7 @@ export async function PUT(
         title: body.title.trim(),
         body: body.body.trim(),
         image_url: imageUrl,
+        author: selectedAuthor,
         username: sessionUsername,
         expa_id: user.id,
       }),
@@ -219,6 +223,7 @@ export async function PUT(
           title: body.title.trim(),
           body: body.body.trim(),
           image_url: imageUrl,
+          author: selectedAuthor,
           username: sessionUsername,
           expa_id: String(user.id),
           updated_at: new Date().toISOString(),

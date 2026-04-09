@@ -57,6 +57,7 @@ export default function PostForm({ mode, postId }: Props) {
 
         setTitle(data.title)
         setBody(data.body)
+        setAuthorName(data.author || "Anonymous")
         setImageUrl(data.image_url || "")
         setLoadedOwnerId(data.expa_id)
         setError("")
@@ -106,6 +107,7 @@ export default function PostForm({ mode, postId }: Props) {
           title: title.trim(),
           body: body.trim(),
           image_url: imageUrl.trim() || undefined,
+          author: authorName.trim() || "Anonymous",
           username: user.username || user.full_name?.trim() || "",
           expa_id: String(user.id),
         })
@@ -165,7 +167,7 @@ export default function PostForm({ mode, postId }: Props) {
   }
 
   return (
-    <main className="mx-auto max-w-xl px-3 py-8 sm:py-12">
+    <main className="mx-auto max-w-2xl px-3 py-6 sm:py-8">
       <div className="rounded-2xl bg-white/80 p-5 shadow-xl ring-1 ring-black/10 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -208,7 +210,7 @@ export default function PostForm({ mode, postId }: Props) {
           </div>
         )}
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        <form className="mt-5 space-y-3" onSubmit={handleSubmit}>
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="title">
               Title
@@ -233,30 +235,28 @@ export default function PostForm({ mode, postId }: Props) {
               id="body"
               value={body}
               onChange={(event) => setBody(event.target.value)}
-              rows={10}
+              rows={7}
               className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-black/30"
               disabled={!canSubmit}
               required
             />
           </div>
 
-          {!isEditMode && (
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="authorName">
-                Author Name
-              </label>
-              <input
-                id="authorName"
-                type="text"
-                value={authorName}
-                onChange={(event) => setAuthorName(event.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-black/30"
-                maxLength={80}
-                placeholder="Leave empty to publish as Anonymous"
-                disabled={!canSubmit}
-              />
-            </div>
-          )}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="authorName">
+              Author Name
+            </label>
+            <input
+              id="authorName"
+              type="text"
+              value={authorName}
+              onChange={(event) => setAuthorName(event.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-black/30"
+              maxLength={80}
+              placeholder="Leave empty to publish as Anonymous"
+              disabled={!canSubmit}
+            />
+          </div>
 
           <div className="flex flex-wrap gap-3 pt-2">
             <button

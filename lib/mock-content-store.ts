@@ -123,6 +123,8 @@ export function updateMockPost(id: string, input: UpdatePostInput) {
 
   post.title = input.title
   post.body = input.body
+  post.image_url = input.image_url
+  post.author = input.author?.trim() || post.author || "Anonymous"
   post.updated_at = nowIso()
 
   return post
