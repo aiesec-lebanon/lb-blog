@@ -34,7 +34,8 @@ interface ValidationResponse {
  * Office IDs can be found in EXPA or in this reference sheet:
  * https://docs.google.com/spreadsheets/d/1A8Epd__j7OKFO85A0JAJUZcoCuvKee3DHpn0cDafx6E/edit
  */
-const ALLOWED_AIESEC_OFFICE_IDS: string[] = ["182", "5853", "6547", "6550", "5854", "1735", "6549"];
+const ALLOWED_AIESEC_OFFICE_IDS: string[] = [];
+// const ALLOWED_AIESEC_OFFICE_IDS: string[] = ["182", "5853", "6547", "6550", "5854", "1735", "6549"];
 
 /**
  * Allowed Roles
