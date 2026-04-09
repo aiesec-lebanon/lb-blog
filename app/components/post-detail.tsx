@@ -114,7 +114,9 @@ export default function PostDetail({ postId }: Props) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm text-gray-500">
-              {post.username} • {formatDate(post.created_at)}
+              <span>Author: {post.author || post.username || "Anonymous"}</span>
+              <span> • </span>
+              <span>Created: {formatDate(post.created_at)}</span>
             </p>
             <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900">{post.title}</h1>
           </div>
