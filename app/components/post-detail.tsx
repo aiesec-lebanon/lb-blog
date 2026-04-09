@@ -104,13 +104,13 @@ export default function PostDetail({ postId }: Props) {
       <div>
         <Link
           href="/posts"
-          className="inline-flex rounded-lg border border-gray-200 bg-white/80 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-black/5"
+          className="inline-flex rounded-lg border border-gray-200 bg-white/78 backdrop-blur-lg px-3 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-black/5"
         >
           Back to posts
         </Link>
       </div>
 
-      <article className="rounded-2xl bg-white/80 p-5 shadow-xl ring-1 ring-black/10 sm:p-6">
+      <article className="rounded-2xl bg-white/78 backdrop-blur-lg p-5 shadow-xl ring-1 ring-black/10 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm text-gray-500">
@@ -142,11 +142,11 @@ export default function PostDetail({ postId }: Props) {
         </div>
 
         {commentsLoading ? (
-          <div className="rounded-2xl bg-white/80 p-5 text-sm text-gray-500 shadow-lg ring-1 ring-black/10">
+          <div className="rounded-2xl bg-white/78 backdrop-blur-lg p-5 text-sm text-gray-500 shadow-lg ring-1 ring-black/10">
             Loading comments...
           </div>
         ) : comments.length === 0 ? (
-          <div className="rounded-2xl bg-white/80 p-5 text-sm text-gray-500 shadow-lg ring-1 ring-black/10">
+          <div className="rounded-2xl bg-white/78 backdrop-blur-lg p-5 text-sm text-gray-500 shadow-lg ring-1 ring-black/10">
             No comments yet.
           </div>
         ) : (

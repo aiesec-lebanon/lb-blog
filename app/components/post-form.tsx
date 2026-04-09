@@ -153,7 +153,7 @@ export default function PostForm({ mode, postId }: Props) {
   if (isEditMode && !isOwner) {
     return (
       <div className="mx-auto max-w-xl px-3 py-10">
-        <div className="rounded-2xl bg-white/80 p-6 shadow-xl ring-1 ring-black/10">
+        <div className="rounded-2xl bg-white/78 backdrop-blur-lg p-6 shadow-xl ring-1 ring-black/10">
           <h1 className="text-2xl font-bold text-gray-900">Not authorized</h1>
           <p className="mt-3 text-sm text-gray-600">
             You can only edit posts that belong to your account.
@@ -168,7 +168,7 @@ export default function PostForm({ mode, postId }: Props) {
 
   return (
     <main className="mx-auto max-w-2xl px-3 py-6 sm:py-8">
-      <div className="rounded-2xl bg-white/80 p-5 shadow-xl ring-1 ring-black/10 sm:p-6">
+      <div className="rounded-2xl bg-white/78 backdrop-blur-lg p-5 shadow-xl ring-1 ring-black/10 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">

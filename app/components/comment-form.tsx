@@ -47,7 +47,7 @@ export default function CommentForm({ postId, onCreated }: Props) {
   }
 
   return (
-    <div className="rounded-2xl bg-white/80 p-5 shadow-xl ring-1 ring-black/10 sm:p-6">
+    <div className="rounded-2xl bg-white/78 backdrop-blur-lg p-5 shadow-xl ring-1 ring-black/10 sm:p-6">
       <h2 className="text-lg font-semibold text-gray-900">Add a comment</h2>
       <p className="mt-1 text-sm text-gray-500">Share a quick thought about this post.</p>
 

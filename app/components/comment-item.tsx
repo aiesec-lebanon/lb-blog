@@ -62,7 +62,7 @@ export default function CommentItem({ comment, canEdit, onChanged }: Props) {
   }
 
   return (
-    <article className="rounded-2xl bg-white/80 p-4 shadow-lg ring-1 ring-black/10 sm:p-5">
+    <article className="rounded-2xl bg-white/78 backdrop-blur-lg p-4 shadow-lg ring-1 ring-black/10 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-gray-900">{comment.username}</p>
