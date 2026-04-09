@@ -11,8 +11,11 @@ export default function CreateButton() {
       onClick={() => router.push("/add")}
       className="
         fixed 
-        top-[12vh]
-        right-10
+        top-[14vh]
+        right-3
+        sm:right-4
+        md:top-[12vh]
+        md:right-10
         z-50
         bg-black 
         text-white 
