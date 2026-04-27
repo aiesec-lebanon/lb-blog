@@ -36,6 +36,7 @@ export async function POST() {
 
   // OAuth access token
   response.cookies.delete("aiesec_token");
+  response.cookies.delete("guest_token");
 
   // OAuth refresh token
   response.cookies.delete("refresh_token");

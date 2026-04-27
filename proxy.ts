@@ -35,6 +35,7 @@ export function proxy(req: NextRequest) {
     const aiesecToken = req.cookies.get("aiesec_token")?.value;
     const refreshToken = req.cookies.get("refresh_token")?.value;
     const tokenExpiresAt = req.cookies.get("token_expires_at")?.value;
+    const guestToken = req.cookies.get("guest_token")?.value;
 
     /**
      * ------------------------------------------------------------
@@ -82,7 +83,7 @@ export function proxy(req: NextRequest) {
      * and must be redirected to the login page.
      */
 
-    if (!aiesecToken) {
+    if (!aiesecToken && !guestToken) {
         const loginUrl = new URL("/login", req.url);
         return NextResponse.redirect(loginUrl);
     }

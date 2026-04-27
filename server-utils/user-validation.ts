@@ -90,7 +90,7 @@ export default async function validateUser(accessToken: string): Promise<Validat
         const hasOfficeRestriction = ALLOWED_AIESEC_OFFICE_IDS.length > 0 && !ALLOWED_AIESEC_OFFICE_IDS.includes("1626");
         const hasRoleRestriction = ALLOWED_ROLES.length > 0;
 
-        const isValid = userInfo.current_positions.some((position) => {
+        const isValid = userInfo.current_positions?.some((position) => {
             const officeAllowed =
                 !hasOfficeRestriction || ALLOWED_AIESEC_OFFICE_IDS.includes(position.office.id);
 
@@ -98,7 +98,9 @@ export default async function validateUser(accessToken: string): Promise<Validat
                 !hasRoleRestriction || ALLOWED_ROLES.includes(position.role.name);
 
             return officeAllowed && roleAllowed;
-        });
+        }) || false;
+
+        userInfo.isGuest = !isValid;
 
         /**
          * Return validation result with user info

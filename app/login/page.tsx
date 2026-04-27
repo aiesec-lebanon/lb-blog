@@ -1,65 +1,77 @@
 'use client';
 
-import { useEffect } from 'react';
-
-/**
- * ------------------------------------------------------------
- * LOGIN PAGE
- * ------------------------------------------------------------
- *
- * This page initiates the OAuth authentication flow.
- *
- * When the page loads, it automatically redirects the user
- * to the configured authentication provider's authorization
- * endpoint.
- *
- * The authentication provider will then:
- *
- * 1. Prompt the user to log in
- * 2. Redirect back to `/api/auth/callback`
- * 3. Include an authorization `code` in the query parameters
- *
- * That authorization code is later exchanged for an access token
- * in the callback route.
- *
- * Environment variables required:
- *
- * NEXT_PUBLIC_AUTH_URL
- *   → Base URL of the OAuth provider
- *
- * NEXT_PUBLIC_CLIENT_ID
- *   → OAuth client ID registered with the provider
- */
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
+  const [isGuest, setIsGuest] = useState(false);
+  const [username, setUsername] = useState('');
 
-  /**
-   * Trigger OAuth authorization redirect when the page loads
-   */
-  useEffect(() => {
-
-    /**
-     * Build the authorization request parameters
-     */
+  const handleAiesecLogin = () => {
     const params = new URLSearchParams({
       response_type: 'code', // OAuth authorization code flow
       client_id: process.env.NEXT_PUBLIC_CLIENT_ID || '',
       redirect_uri: `${window.location.origin}/api/auth/callback`,
+    });  
+    
+    window.location.href = `${process.env.NEXT_PUBLIC_AUTH_URL}/authorize?${params.toString()}`;
+  }
+
+  const handleGuestLogin = async () => {
+    if (!username.trim()) return;
+
+    await fetch('/api/auth/guest', {
+      method: 'POST',
+      body: JSON.stringify({ username }),
     });
 
-    /**
-     * Redirect the user to the OAuth provider login page
-     */
-    window.location.href = `${process.env.NEXT_PUBLIC_AUTH_URL}/authorize?${params.toString()}`;
+    window.location.href = '/'; // go to app
+  };
 
-  }, []);
-
-  /**
-   * While the redirect is happening, show a simple loading spinner
-   */
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+
+      {/* 👇 Opaque container */}
+      <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-xl flex flex-col items-center gap-6">
+
+        {/* Logo */}
+        <Image src="/blue_house.png" width={70} height={70} alt='' />
+
+        {/* AIESEC Login */}
+        <button
+          onClick={handleAiesecLogin}
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold w-72"
+        >
+          Log in with AIESEC
+        </button>
+
+        {/* Guest Option */}
+        {!isGuest ? (
+          <button
+            onClick={() => setIsGuest(true)}
+            className="text-gray-600 underline"
+          >
+            Login as a guest
+          </button>
+        ) : (
+          <div className="flex flex-col gap-3 w-72">
+            <input
+              type="text"
+              placeholder="Enter a username"
+              className="border p-2 rounded"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <button
+              onClick={handleGuestLogin}
+              className="bg-gray-800 text-white py-2 rounded"
+            >
+              Continue as Guest
+            </button>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
