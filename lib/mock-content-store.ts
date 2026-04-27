@@ -72,7 +72,7 @@ function nowIso() {
 function normalizeOwner(user: UserInfo) {
   return {
     expa_id: user.id,
-    username: user.username || user.full_name.trim(),
+    username: user.username || user.full_name?.trim() || "",
   }
 }
 
@@ -101,7 +101,7 @@ export function createMockPost(input: CreatePostInput, user: UserInfo) {
     title: input.title,
     body: input.body,
     username: owner.username,
-    expa_id: owner.expa_id,
+    expa_id: owner.expa_id?.toString() || "",
     created_at: createdAt,
     updated_at: createdAt,
     timestamp: createdAt,
@@ -156,7 +156,7 @@ export function createMockComment(input: CreateCommentInput, user: UserInfo) {
     post_id: input.post_id,
     body: input.body,
     username: owner.username,
-    expa_id: owner.expa_id,
+    expa_id: owner.expa_id?.toString() || "",
     created_at: nowIso(),
   }
 

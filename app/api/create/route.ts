@@ -14,11 +14,11 @@ export async function POST(req: NextRequest) {
     }
 
     const user: UserInfo = await JSON.parse(req.cookies.get("user")?.value || "{}")
-    if (!user.id) {
-      return NextResponse.redirect(new URL("/login", req.url))
-    }
+    // if (!user.id) {
+    //   return NextResponse.redirect(new URL("/login", req.url))
+    // }
     const expa_id = user.id
-    const username = user.full_name.trim()
+    const username = user.full_name?.trim() || user.username?.trim() || ""
 
     const API = process.env.API_URL
 
